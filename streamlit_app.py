@@ -41,7 +41,7 @@ def load_and_index_songs(source: str, sample_size: int):
     return songs
 
 
-st.set_page_config(page_title="Music Recommender", page_icon="🎵", layout="centered")
+st.set_page_config(page_title="Tunecraft", page_icon="🎵", layout="centered")
 
 st.markdown(
     """
@@ -56,7 +56,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("🎵 Music Recommender")
+st.title("🎵 Tunecraft")
 st.caption("Tell it what you like, or just describe a vibe, and get a ranked, explained playlist.")
 
 with st.sidebar:
