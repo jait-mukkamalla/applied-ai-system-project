@@ -41,7 +41,9 @@ def load_and_index_songs(source: str, sample_size: int):
     return songs
 
 
-st.set_page_config(page_title="Tunecraft", page_icon="🎵", layout="centered")
+RANK_BADGES = {1: "🥇", 2: "🥈", 3: "🥉"}
+
+st.set_page_config(page_title="Tunecraft", page_icon="🎵", layout="wide")
 
 st.markdown(
     """
@@ -50,6 +52,9 @@ st.markdown(
         background: rgba(127, 127, 127, 0.08);
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
+      }
+      div[data-testid="stAlert"] {
+        border-radius: 0.5rem;
       }
     </style>
     """,
@@ -61,19 +66,19 @@ st.caption("Tell it what you like, or just describe a vibe, and get a ranked, ex
 
 with st.sidebar:
     st.header("Song source")
-    source = st.selectbox("Where should songs come from?", SOURCE_OPTIONS, index=0)
+    source = st.selectbox("Where should songs come from?", SOURCE_OPTIONS, index=SOURCE_OPTIONS.index(SOURCE_COMBINED))
     sample_size = DEFAULT_SAMPLE_SIZE
     if source in (SOURCE_RAG, SOURCE_COMBINED):
         sample_size = st.number_input(
             "RAG sample size", min_value=100, max_value=10000,
-            value=DEFAULT_SAMPLE_SIZE, step=100,
+            value=1000, step=500,
         )
     st.caption("Switching source rebuilds the semantic index the first time it's used.")
 
 try:
     songs = load_and_index_songs(source, sample_size)
 except Exception as exc:
-    st.error(f"Failed to load songs: {exc}")
+    st.error(f"⚠️ Failed to load songs: {exc}")
     st.stop()
 
 # Genre/mood options are derived from whatever pool actually loaded, rather
@@ -119,12 +124,14 @@ if submitted:
     )
 
     try:
-        recommendations = get_recommendations(user, songs, k=k)
+        with st.status("Scoring your preferences against the song pool...", expanded=False) as status:
+            recommendations = get_recommendations(user, songs, k=k)
+            status.update(label="Done ranking recommendations.", state="complete")
     except Exception as exc:
-        st.error(f"Failed to generate recommendations: {exc}")
+        st.error(f"⚠️ Failed to generate recommendations: {exc}")
     else:
         if not recommendations:
-            st.info("No recommendations matched your preferences.")
+            st.info("🤔 No recommendations matched your preferences. Try loosening a filter or the free-text description.")
         else:
             st.divider()
             st.subheader("Recommendations")
@@ -132,7 +139,8 @@ if submitted:
                 with st.container(border=True):
                     title_col, score_col = st.columns([4, 1])
                     with title_col:
-                        st.markdown(f"**{rank}. {song.title}** — {song.artist}")
+                        badge = RANK_BADGES.get(rank, f"{rank}.")
+                        st.markdown(f"**{badge} {song.title}** — {song.artist}")
                         st.caption(f"{song.genre} · {song.mood}")
                     with score_col:
                         st.markdown(f"<div style='text-align:right'><b>{score:.1f}</b></div>", unsafe_allow_html=True)
