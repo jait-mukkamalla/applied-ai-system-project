@@ -1,0 +1,52 @@
+flowchart TD
+    subgraph Input["Input"]
+        UI["Streamlit UI (streamlit_app.py)<br/>'Tunecraft' — structured prefs + free-text query"]
+    end
+
+    subgraph Ingestion["Data Ingestion"]
+        CSVSrc["Local CSV (data/songs.csv)"]
+        RAGSrc["RAG fetch: tidytuesday Spotify dataset<br/>(src/rag.py: fetch_songs_from_rag)"]
+        Sanitize["sanitize_songs()<br/>single validation boundary<br/>(src/recommender.py)"]
+    end
+
+    subgraph Retrieval["Retriever"]
+        Embed["embed_songs()<br/>(src/vector_store.py + embeddings.py)"]
+        Chroma[("Chroma vector store<br/>data/chroma")]
+        Search["search_similar(query_text)<br/>semantic candidate pool"]
+    end
+
+    subgraph Agent["Recommendation Agent"]
+        GetRec["get_recommendations()<br/>single entry point, infers mode"]
+        Score["score_song() / recommend_songs()<br/>weighted feature scoring + diversity cap"]
+    end
+
+    subgraph Output["Output"]
+        Results["Ranked (song, score, explanation) list"]
+    end
+
+    subgraph Verification["Human & Automated Verification"]
+        Tests["pytest suite (tests/)<br/>unit + regression tests"]
+        Adversarial["Adversarial profiles<br/>(tests/fixtures/adversarial_profiles.py)<br/>empty prefs, invalid mode, out-of-range energy"]
+        Human["Human review in Streamlit UI<br/>reads explanation + score before trusting result"]
+    end
+
+    CSVSrc --> Sanitize
+    RAGSrc --> Sanitize
+    Sanitize --> Embed
+    Embed --> Chroma
+
+    UI --> GetRec
+
+    GetRec -- "if query_text set" --> Search
+    Search --> Chroma
+    Chroma -- "top-k similar songs" --> Score
+    GetRec -- "else: full song pool" --> Score
+
+    Score --> Results
+    Results --> UI
+
+    Tests -.->|validates| Sanitize
+    Tests -.->|validates| Score
+    Tests -.->|validates| Search
+    Adversarial -.->|stress-tests| Score
+    Human -.->|inspects & judges| Results
