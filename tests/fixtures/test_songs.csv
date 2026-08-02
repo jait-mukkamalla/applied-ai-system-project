@@ -1,0 +1,11 @@
+id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
+1,Sunny Day,The Ramblers,pop,happy,0.80,128,0.85,0.75,0.15
+2,Night Drive,The Ramblers,synthwave,energetic,0.75,118,0.60,0.70,0.10
+3,Quiet Room,Elena Cross,ambient,peaceful,0.15,70,0.40,0.20,0.95
+4,Basement Riot,Steel Wolves,punk,angry,0.95,170,0.30,0.55,0.05
+5,Golden Hour,Mara Lin,folk,warm,0.35,95,0.65,0.40,0.85
+6,Concrete Heartbeat,DJ Kessler,house,euphoric,0.85,126,0.80,0.85,0.05
+7,Late Night Study,Wren Ashby,lofi,focused,0.30,82,0.50,0.45,0.70
+8,Old Photographs,Mara Lin,jazz,nostalgic,0.25,90,0.45,0.35,0.75
+9,Heartbreak Highway,Toma Reyes,country,melancholic,0.40,100,0.35,0.50,0.40
+10,Rebel Yell Redux,Steel Wolves,metal,rebellious,0.90,150,0.40,0.60,0.10
