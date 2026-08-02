@@ -19,16 +19,6 @@ SOURCE_RAG = "RAG (live fetch, ~4k real tracks)"
 SOURCE_COMBINED = "Combined (RAG + CSV)"
 SOURCE_OPTIONS = [SOURCE_CSV, SOURCE_RAG, SOURCE_COMBINED]
 
-GENRE_OPTIONS = [
-    "ambient", "blues", "classical", "country", "edm", "folk", "hip hop",
-    "house", "indie pop", "jazz", "latin", "lofi", "metal", "pop", "punk",
-    "r&b", "rap", "reggae", "rock", "synthwave",
-]
-MOOD_OPTIONS = [
-    "angry", "chill", "energetic", "euphoric", "focused", "happy", "intense",
-    "laid-back", "melancholic", "moody", "nostalgic", "peaceful",
-    "rebellious", "relaxed", "romantic", "warm",
-]
 NO_PREFERENCE = "(no preference)"
 
 
@@ -51,8 +41,23 @@ def load_and_index_songs(source: str, sample_size: int):
     return songs
 
 
-st.set_page_config(page_title="Music Recommender", page_icon="🎵")
+st.set_page_config(page_title="Music Recommender", page_icon="🎵", layout="centered")
+
+st.markdown(
+    """
+    <style>
+      div[data-testid="stMetric"] {
+        background: rgba(127, 127, 127, 0.08);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+      }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.title("🎵 Music Recommender")
+st.caption("Tell it what you like, or just describe a vibe, and get a ranked, explained playlist.")
 
 with st.sidebar:
     st.header("Song source")
@@ -63,6 +68,7 @@ with st.sidebar:
             "RAG sample size", min_value=100, max_value=10000,
             value=DEFAULT_SAMPLE_SIZE, step=100,
         )
+    st.caption("Switching source rebuilds the semantic index the first time it's used.")
 
 try:
     songs = load_and_index_songs(source, sample_size)
@@ -70,26 +76,39 @@ except Exception as exc:
     st.error(f"Failed to load songs: {exc}")
     st.stop()
 
-st.caption(f"{len(songs)} songs loaded from: {source}")
+# Genre/mood options are derived from whatever pool actually loaded, rather
+# than a fixed list -- the CSV and RAG sources use different genre/mood
+# taxonomies, so a static list would offer choices with zero matching songs.
+genre_options = sorted({song.genre for song in songs})
+mood_options = sorted({song.mood for song in songs})
 
-st.header("Your preferences")
-col1, col2 = st.columns(2)
-with col1:
-    favorite_genre = st.selectbox("Favorite genre", [NO_PREFERENCE] + GENRE_OPTIONS)
-    target_energy = st.slider("Target energy", 0.0, 1.0, 0.5, step=0.05)
-    mode = st.selectbox("Scoring mode", sorted(WEIGHT_PRESETS), index=sorted(WEIGHT_PRESETS).index("balanced"))
-with col2:
-    favorite_mood = st.selectbox("Favorite mood", [NO_PREFERENCE] + MOOD_OPTIONS)
-    likes_acoustic = st.checkbox("I like acoustic tracks", value=False)
+metric_cols = st.columns(3)
+metric_cols[0].metric("Songs loaded", len(songs))
+metric_cols[1].metric("Genres", len(genre_options))
+metric_cols[2].metric("Moods", len(mood_options))
 
-query_text = st.text_input(
-    "Optional: describe what you're in the mood for (free text)",
-    placeholder="e.g. late-night driving music with a dreamy vibe",
-)
+st.divider()
 
-k = st.slider("How many recommendations?", 1, 20, 5)
+with st.container(border=True):
+    st.subheader("Your preferences")
+    col1, col2 = st.columns(2)
+    with col1:
+        favorite_genre = st.selectbox("Favorite genre", [NO_PREFERENCE] + genre_options)
+        target_energy = st.slider("Target energy", 0.0, 1.0, 0.5, step=0.05)
+        mode = st.selectbox("Scoring mode", sorted(WEIGHT_PRESETS), index=sorted(WEIGHT_PRESETS).index("balanced"))
+    with col2:
+        favorite_mood = st.selectbox("Favorite mood", [NO_PREFERENCE] + mood_options)
+        likes_acoustic = st.checkbox("I like acoustic tracks", value=False)
 
-if st.button("Get recommendations", type="primary"):
+    query_text = st.text_input(
+        "Optional: describe what you're in the mood for (free text)",
+        placeholder="e.g. late-night driving music with a dreamy vibe",
+    )
+
+    k = st.slider("How many recommendations?", 1, 20, 5)
+    submitted = st.button("Get recommendations", type="primary", use_container_width=True)
+
+if submitted:
     user = UserProfile(
         favorite_genre=None if favorite_genre == NO_PREFERENCE else favorite_genre,
         favorite_mood=None if favorite_mood == NO_PREFERENCE else favorite_mood,
@@ -107,9 +126,15 @@ if st.button("Get recommendations", type="primary"):
         if not recommendations:
             st.info("No recommendations matched your preferences.")
         else:
-            st.header("Recommendations")
+            st.divider()
+            st.subheader("Recommendations")
             for rank, (song, score, explanation) in enumerate(recommendations, start=1):
                 with st.container(border=True):
-                    st.subheader(f"{rank}. {song.title} — {song.artist}")
-                    st.write(f"**Score:** {score:.2f}  |  **Genre:** {song.genre}  |  **Mood:** {song.mood}")
+                    title_col, score_col = st.columns([4, 1])
+                    with title_col:
+                        st.markdown(f"**{rank}. {song.title}** — {song.artist}")
+                        st.caption(f"{song.genre} · {song.mood}")
+                    with score_col:
+                        st.markdown(f"<div style='text-align:right'><b>{score:.1f}</b></div>", unsafe_allow_html=True)
+                    st.progress(min(max(score, 0.0), 100.0) / 100.0)
                     st.caption(explanation)
