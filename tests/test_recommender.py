@@ -1,4 +1,4 @@
-from src.recommender import Song, UserProfile, Recommender
+from src.recommender import Song, UserProfile, Recommender, sanitize_song, sanitize_songs
 
 def make_small_recommender() -> Recommender:
     songs = [
@@ -59,3 +59,50 @@ def test_explain_recommendation_returns_non_empty_string():
     explanation = rec.explain_recommendation(user, song)
     assert isinstance(explanation, str)
     assert explanation.strip() != ""
+
+
+def test_sanitize_song_fills_missing_fields_with_defaults():
+    song = sanitize_song({"id": "7", "title": "Untitled"})
+
+    assert song.id == 7
+    assert song.title == "Untitled"
+    assert song.artist == "Unknown Artist"
+    assert song.genre == "unknown"
+    assert song.mood == "unknown"
+    assert song.energy == 0.5
+    assert song.tempo_bpm == 120.0
+
+
+def test_sanitize_song_clamps_out_of_range_values():
+    song = sanitize_song({
+        "id": 1,
+        "title": "Loud",
+        "artist": "Someone",
+        "genre": "pop",
+        "mood": "happy",
+        "energy": "150",  # looks like a 0-100 scale, should rescale to 1.5 -> clamp to 1.0
+        "tempo_bpm": "-10",
+        "valence": "1000",  # far outside any plausible scale, should clamp to 1.0
+        "danceability": "0.5",
+        "acousticness": "0.5",
+    })
+
+    assert song.energy == 1.0
+    assert song.tempo_bpm == 120.0
+    assert song.valence == 1.0
+
+
+def test_sanitize_song_drops_unsalvageable_row():
+    assert sanitize_song({"title": "No ID"}) is None
+    assert sanitize_song({}) is None
+
+
+def test_sanitize_songs_filters_dropped_rows():
+    raw_rows = [
+        {"id": 1, "title": "Good Row"},
+        {"title": "Missing ID"},
+    ]
+    songs = sanitize_songs(raw_rows)
+
+    assert len(songs) == 1
+    assert songs[0].title == "Good Row"

@@ -1,8 +1,16 @@
 import csv
+import logging
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 
+logger = logging.getLogger(__name__)
+
 DEFAULT_MODE = "balanced"
+
+# Song feature fields expected in [0.0, 1.0].
+UNIT_RANGE_FIELDS = ("energy", "valence", "danceability", "acousticness")
+DEFAULT_UNIT_VALUE = 0.5
+DEFAULT_TEMPO_BPM = 120.0
 
 @dataclass
 class Song:
@@ -57,29 +65,87 @@ class Recommender:
         _score, reasons = score_song(user, song)
         return ", ".join(reasons) if reasons else "No strong matches on your preferences"
 
+def _to_float(value, default: float) -> float:
+    """Coerce value to float, falling back to default on missing/unparsable input."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+def _clamp_unit(value: float) -> float:
+    """Clamp a feature value into [0.0, 1.0], rescaling values that look like a 0-100 scale."""
+    if value > 1.0 and value <= 100.0:
+        value = value / 100.0
+    return max(0.0, min(1.0, value))
+
+def sanitize_song(raw: Dict) -> Optional[Song]:
+    """
+    Validates and normalizes a single raw song row into a Song instance.
+
+    This is the single ingestion boundary for song data, regardless of
+    whether it originates from CSV (load_songs) or RAG (src/rag.py) — both
+    route through here so scoring logic never has to defend against bad
+    input. `id` is the only field treated as load-bearing: without a valid
+    id the row can't be identified, so it's dropped (returns None). Every
+    other field is coerced/clamped/defaulted rather than rejected.
+    """
+    if not raw:
+        return None
+
+    try:
+        song_id = int(raw["id"])
+    except (KeyError, TypeError, ValueError):
+        return None
+
+    title = str(raw.get("title") or "Unknown Title")
+    artist = str(raw.get("artist") or "Unknown Artist")
+    genre = str(raw.get("genre") or "unknown")
+    mood = str(raw.get("mood") or "unknown")
+
+    unit_values = {
+        field: _clamp_unit(_to_float(raw.get(field), DEFAULT_UNIT_VALUE))
+        for field in UNIT_RANGE_FIELDS
+    }
+
+    tempo_bpm = _to_float(raw.get("tempo_bpm"), DEFAULT_TEMPO_BPM)
+    if tempo_bpm <= 0:
+        tempo_bpm = DEFAULT_TEMPO_BPM
+
+    return Song(
+        id=song_id,
+        title=title,
+        artist=artist,
+        genre=genre,
+        mood=mood,
+        tempo_bpm=tempo_bpm,
+        **unit_values,
+    )
+
+def sanitize_songs(raw_list: List[Dict]) -> List[Song]:
+    """Sanitizes a list of raw song rows, dropping unsalvageable ones and logging the count."""
+    sanitized = []
+    dropped = 0
+    for raw in raw_list:
+        song = sanitize_song(raw)
+        if song is None:
+            dropped += 1
+            continue
+        sanitized.append(song)
+
+    if dropped:
+        logger.warning("sanitize_songs: dropped %d of %d row(s)", dropped, len(raw_list))
+
+    return sanitized
+
 def load_songs(csv_path: str) -> List[Song]:
     """
-    Loads songs from a CSV file.
+    Loads songs from a CSV file, routed through sanitize_songs.
     Required by src/main.py
     """
-    songs = []
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        for row in reader:
-            song = Song(
-                id=int(row["id"]),
-                title=row["title"],
-                artist=row["artist"],
-                genre=row["genre"],
-                mood=row["mood"],
-                energy=float(row["energy"]),
-                tempo_bpm=float(row["tempo_bpm"]),
-                valence=float(row["valence"]),
-                danceability=float(row["danceability"]),
-                acousticness=float(row["acousticness"]),
-            )
-            songs.append(song)
-    return songs
+        raw_rows = list(reader)
+    return sanitize_songs(raw_rows)
 
 # Mood -> implied (valence_target, danceability_target).
 # Lets score_song reason about valence/danceability even though UserProfile /
