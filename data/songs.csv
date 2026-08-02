@@ -19,3 +19,153 @@ id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
 18,Island Sway,Tide & Tamarind,reggae,laid-back,0.45,78,0.75,0.70,0.40
 19,Rainy Window Blues,Delta Hollow,blues,melancholic,0.38,68,0.30,0.40,0.55
 20,Broken Curfew,Static Riot,punk,rebellious,0.95,175,0.55,0.60,0.05
+21,Hooked,Notion,edm,happy,0.79,128.0,0.85,0.78,0.14
+22,Sun Chaser,No Mana,edm,angry,0.92,128.0,0.06,0.72,0.0
+23,Symphonica - Suedes Dubstep Remix,Nicky Romero,edm,warm,0.97,70.0,0.69,0.48,0.0
+24,Destination,DubVision,edm,moody,0.76,127.0,0.51,0.69,0.04
+25,"Body on My (feat. Brando, Pitbull & Nicky Jam)",Loud Luxury,edm,laid-back,0.73,122.0,0.69,0.74,0.04
+26,Soldiers - Original Mix,Mike Hawkins,edm,angry,0.94,128.0,0.19,0.47,0.0
+27,Scared To Be Lonely - Brooks Remix,Martin Garrix,edm,angry,0.8,128.0,0.23,0.6,0.01
+28,Cause 2 - Original Mix,Tensal,edm,angry,0.77,127.0,0.04,0.69,0.04
+29,Storm (feat. Kyra Mastro),Famba,edm,moody,0.72,122.0,0.29,0.75,0.04
+30,Burn Break Crash,Aanysa,edm,moody,0.74,122.0,0.4,0.78,0.07
+31,We found another earth,Diskay,edm,angry,0.74,111.0,0.04,0.71,0.62
+32,Cruise,Clément Leroux,edm,angry,0.58,122.1,0.3,0.63,0.32
+33,Part Of Me (Club Remix) (feat. Kareem),LittleKings,edm,intense,0.75,124.0,0.62,0.76,0.01
+34,We Found Love - Sidney Samson Remix,Sultan + Shepard,edm,angry,0.96,130.0,0.36,0.63,0.0
+35,Recoil,K3L,edm,moody,0.97,128.0,0.39,0.75,0.0
+36,Fireflies - Radio Edit,John Dahlbäck,edm,angry,0.79,128.1,0.16,0.6,0.0
+37,Falling For You,Anaesthesia,edm,laid-back,0.56,85.0,0.7,0.75,0.9
+38,So Close - Curbi Remix,NOTD,edm,angry,0.88,128.1,0.12,0.64,0.04
+39,Emotions Attached,Stan Kolev,edm,moody,0.57,123.0,0.38,0.81,0.1
+40,Believe,Kosling,edm,melancholic,0.84,128.0,0.33,0.42,0.17
+41,Feather,Lost Kings,edm,moody,0.63,141.0,0.43,0.76,0.3
+42,I Was Born To Love You,Timeless Legend,edm,laid-back,0.81,117.6,0.88,0.66,0.02
+43,Wonderful Days,Cuebrick,edm,angry,0.63,138.1,0.4,0.5,0.09
+44,Funeral March - Original Mix,Black Tiger Sex Machine,edm,angry,0.89,180.1,0.22,0.46,0.0
+45,The Stars Are Mine,Chocolate Puma,edm,moody,0.78,126.0,0.36,0.67,0.0
+46,Dreamboy,Ballin Entertainment,latin,laid-back,0.56,127.6,0.73,0.74,0.05
+47,Fireflies - Live From Spotify NYC,Owl City,latin,nostalgic,0.53,153.7,0.7,0.4,0.55
+48,MALA SANTA,Becky G,latin,intense,0.7,98.0,0.53,0.85,0.31
+49,Abrázame Muy Fuerte,Juan Gabriel,latin,angry,0.39,135.7,0.31,0.52,0.69
+50,Goza,Henry Mendez,latin,energetic,0.9,95.0,0.65,0.79,0.1
+51,Feel It,Dualities,latin,energetic,0.88,122.0,0.68,0.84,0.1
+52,Te Quiero Ver,Ceaese,latin,moody,0.84,90.0,0.55,0.77,0.41
+53,Quisiera - Unplugged,Pasabordo,latin,moody,0.6,144.8,0.53,0.72,0.72
+54,Celebration (feat. Ky-Mani Marley),Maffio,latin,happy,0.81,94.0,0.84,0.72,0.11
+55,On The Streets of Dún Laoghaire - Boonz Remix,Broken Legacy,latin,moody,0.45,100.7,0.39,0.62,0.04
+56,Turn the Beat Around,Gloria Estefan,latin,moody,0.8,130.0,0.54,0.73,0.01
+57,Corazon de Acero,Yiyo Sarante,latin,laid-back,0.66,83.7,0.94,0.58,0.53
+58,Más Claro Que el Agua,Donny Caballero,latin,happy,0.82,196.0,0.85,0.74,0.42
+59,Mi Dios es grande (feat. T-Bone),Josue Del Cid,latin,laid-back,0.96,90.1,0.87,0.62,0.01
+60,Atrévete,Nicky Jam,latin,chill,0.68,183.8,0.59,0.55,0.31
+61,De Tranquilote,Danny Romero,latin,laid-back,0.67,79.9,0.89,0.68,0.1
+62,Bae - KVR Remix,Marcus & Martinus,latin,laid-back,0.56,102.0,0.68,0.76,0.08
+63,I Want You,Shana,latin,happy,0.81,119.6,0.83,0.74,0.24
+64,Tiburon,Proyecto Uno,latin,euphoric,0.85,130.2,0.91,0.87,0.2
+65,Hey Lady,Central Coast Clique,latin,energetic,0.45,92.0,0.69,0.9,0.41
+66,Joy - Original Mix,Mizbee,latin,angry,0.56,94.3,0.41,0.57,0.01
+67,Cuerpo en Venta,Noriel,latin,moody,0.6,91.9,0.41,0.7,0.16
+68,Fool Myself (feat. Welms),Lü,latin,angry,0.49,104.9,0.38,0.54,0.21
+69,Tu No Vive Asi (feat. Mambo Kingz & DJ Luian),Arcangel,latin,intense,0.51,120.1,0.62,0.81,0.54
+70,Mi Buen Amor,Gloria Estefan,latin,rebellious,0.39,119.9,0.59,0.61,0.41
+71,Titanium (feat. Sia),David Guetta,pop,angry,0.79,126.1,0.3,0.6,0.07
+72,Sunshine,David Guetta,pop,angry,0.8,128.0,0.22,0.59,0.0
+73,Dangerous (feat. Sam Martin),David Guetta,pop,angry,0.75,92.2,0.43,0.47,0.42
+74,You Keep Calling,BAARD,pop,chill,0.68,112.0,0.6,0.51,0.05
+75,The Lost Boy (feat. Skizzy Mars),Lostboycrow,pop,angry,0.57,144.0,0.23,0.72,0.38
+76,Preach,John Legend,pop,angry,0.73,91.9,0.41,0.51,0.07
+77,No Es Lo Mismo,Morbo,pop,chill,0.86,130.2,0.53,0.49,0.0
+78,Sierra Lift,Blue Hawaii,pop,moody,0.42,160.1,0.31,0.78,0.24
+79,"Call Me Hopeless, but Not Romantic",Mayday Parade,pop,melancholic,0.87,110.5,0.3,0.43,0.0
+80,All My Friends (feat. Tinashe & Chance the Rapper),Snakehips,pop,angry,0.52,95.1,0.18,0.69,0.12
+81,Gimme GImme,iamSHUM,pop,moody,0.86,106.0,0.54,0.7,0.11
+82,Flares,The Script,pop,melancholic,0.35,164.3,0.07,0.29,0.41
+83,There You Are,ZAYN,pop,angry,0.69,77.0,0.3,0.45,0.03
+84,With You,Lewka,pop,moody,0.86,115.0,0.56,0.69,0.38
+85,Sweettalk my Heart - Team Salut Remix,Tove Lo,pop,intense,0.72,111.0,0.58,0.76,0.01
+86,L'amour Toujours (Small Mix),Gigi D'Agostino,pop,romantic,0.88,139.1,0.74,0.64,0.08
+87,Dark Allies,Light Asylum,pop,angry,0.93,140.1,0.16,0.5,0.0
+88,Body Double,Dance Yourself Clean,pop,moody,0.68,108.9,0.47,0.76,0.06
+89,Feeling Lonely,boy pablo,pop,laid-back,0.54,117.9,0.89,0.64,0.01
+90,Eisbaer,Groovezone,pop,happy,0.51,129.5,0.74,0.84,0.16
+91,Right Now,Nick Jonas,pop,rebellious,0.75,104.0,0.57,0.6,0.01
+92,Electricity,Orchestral Manoeuvres In The Dark,pop,relaxed,0.74,81.3,0.66,0.56,0.0
+93,Sea Lo Que Sea Será - feat. Miguel Bosé [Original Mix],Above & Beyond,pop,angry,0.73,129.9,0.18,0.53,0.21
+94,There's Nothing Holdin' Me Back,Shawn Mendes,pop,euphoric,0.81,122.0,0.97,0.87,0.38
+95,Despacito,Luis Fonsi,pop,laid-back,0.8,177.9,0.84,0.66,0.2
+96,Lost Without U,Robin Thicke,r&b,laid-back,0.35,113.2,0.82,0.66,0.23
+97,Beautiful,Daniel Johnson,r&b,angry,0.43,79.2,0.17,0.45,0.37
+98,I'm Cheatin',Dwele,r&b,moody,0.46,92.0,0.47,0.75,0.71
+99,The Way You Make Me Feel - 2012 Remaster,Michael Jackson,r&b,intense,0.85,114.5,0.54,0.88,0.05
+100,P.O.V.,dvsn,r&b,angry,0.34,100.0,0.12,0.81,0.03
+101,Bad By Myself,TLC,r&b,happy,0.77,110.9,0.79,0.81,0.01
+102,You Might Need Somebody,Shola Ama,r&b,romantic,0.64,82.5,0.63,0.68,0.16
+103,No Tellin',Drake,r&b,intense,0.47,95.0,0.62,0.82,0.54
+104,Let's Get Down,Tony! Toni! Toné!,r&b,intense,0.66,103.3,0.58,0.91,0.04
+105,Snitch,Jordan Rakei,r&b,rebellious,0.35,81.1,0.56,0.66,0.26
+106,Bury Me In Gold,Big K.R.I.T.,r&b,chill,0.77,97.9,0.44,0.53,0.02
+107,Lord (feat. Milc),Stewart Villain,r&b,moody,0.77,129.9,0.41,0.72,0.05
+108,Rub You The Right Way,Johnny Gill,r&b,laid-back,0.87,111.9,0.86,0.67,0.02
+109,Billie Jean,The Civil Wars,r&b,chill,0.2,89.6,0.54,0.53,0.83
+110,Build Me Up Buttercup,The Foundations,r&b,laid-back,0.51,133.6,0.85,0.66,0.31
+111,I Just Want You,Caleb Hawley,r&b,chill,0.45,82.2,0.49,0.53,0.45
+112,5 O'clock,Sean C. Johnson,r&b,angry,0.81,84.9,0.32,0.53,0.0
+113,Hey Mr. D.J. - Original Mix - Edit,Zhané,r&b,euphoric,0.65,101.3,0.89,0.86,0.05
+114,Love... (Her Fault) [feat. Bryson Tiller],Wale,r&b,angry,0.6,156.1,0.34,0.59,0.07
+115,So Anxious,Ginuwine,r&b,romantic,0.4,96.1,0.66,0.73,0.28
+116,We're Blessed,Fred Hammond,r&b,nostalgic,0.97,186.6,0.66,0.33,0.0
+117,Like This,Ledisi,r&b,rebellious,0.77,82.8,0.6,0.6,0.05
+118,Like A Fool (Back To You),Mabryx,r&b,angry,0.76,120.0,0.14,0.58,0.02
+119,single,Musiq Soulchild,r&b,moody,0.58,95.1,0.32,0.71,0.03
+120,Disappear,Christian Rich,r&b,moody,0.2,108.1,0.39,0.83,0.5
+121,Can I Kick It,Logic,rap,moody,0.77,100.1,0.49,0.79,0.61
+122,Killing Spree,Logic,rap,moody,0.77,124.0,0.18,0.85,0.03
+123,I Am The Greatest,Logic,rap,moody,0.81,90.0,0.37,0.8,0.04
+124,1998 (mam to we krwi),Bedoes,rap,angry,0.65,148.7,0.23,0.72,0.32
+125,Easy Does It,Wildstreet,rap,chill,0.87,135.0,0.5,0.55,0.0
+126,Safar,Sikander Kahlon,rap,laid-back,0.6,85.9,0.73,0.75,0.48
+127,Rollercoaster - Bonus Track (Explicit),Ludacris,rap,melancholic,0.68,79.1,0.42,0.39,0.04
+128,Built for This (feat. Freddie Gibbs & Streetlife),Method Man,rap,warm,0.72,159.7,0.7,0.57,0.03
+129,Ain't No Future In Yo' Frontin',MC Breed,rap,laid-back,0.76,102.2,0.73,0.67,0.05
+130,Lemonade,Gucci Mane,rap,laid-back,0.66,142.1,0.75,0.74,0.64
+131,One Minute Man (feat. Ludacris),Missy Elliott,rap,rebellious,0.67,93.8,0.57,0.62,0.03
+132,De Queixo no Chão,Duas Doses,rap,happy,0.78,125.0,0.88,0.74,0.36
+133,Tree of Life,Ab-Soul,rap,angry,0.62,90.2,0.37,0.49,0.16
+134,Check,Young Thug,rap,moody,0.58,111.0,0.37,0.67,0.04
+135,Subimos de Rango,Omy de Oro,rap,happy,0.65,129.8,0.73,0.81,0.75
+136,Can I Kick It?,A Tribe Called Quest,rap,happy,0.67,96.7,0.74,0.85,0.17
+137,Grita,Control Machete,rap,moody,0.95,88.5,0.51,0.65,0.15
+138,Dawood,Sidhu Moose Wala,rap,moody,0.83,86.0,0.47,0.66,0.03
+139,"New York, New York",Tha Dogg Pound,rap,energetic,0.53,87.3,0.69,0.83,0.02
+140,Hauseingang,Pashanim,rap,angry,0.4,79.6,0.28,0.55,0.17
+141,Bill,Peggy Scott-Adams,rap,chill,0.43,165.1,0.59,0.56,0.21
+142,Preto Todo de Ouro,Dfideliz,rap,energetic,0.44,120.0,0.64,0.93,0.41
+143,Evidencia,Baby Rasta & Gringo,rap,intense,0.78,93.0,0.62,0.83,0.09
+144,My Bass Hits Harder,Power Supply,rap,moody,0.59,112.3,0.33,0.83,0.08
+145,Hear Me Calling,Juice WRLD,rap,moody,0.69,88.9,0.5,0.7,0.31
+146,Las Palabras De Amor (The Words Of Love) - Remastered 2011,Queen,rock,melancholic,0.56,81.6,0.13,0.4,0.1
+147,In The Lap Of The Gods - Remastered 2011,Queen,rock,melancholic,0.55,80.5,0.23,0.33,0.55
+148,My Fairy King - Remastered 2011,Queen,rock,melancholic,0.55,95.7,0.25,0.3,0.41
+149,Long Tall Sally (The Thing),Little Richard,rock,warm,0.6,184.5,0.92,0.47,0.77
+150,Loser,3 Doors Down,rock,angry,0.88,147.9,0.39,0.5,0.01
+151,People Are People,Depeche Mode,rock,laid-back,0.83,120.0,0.81,0.68,0.08
+152,The Real Me,The Who,rock,chill,0.93,148.8,0.57,0.49,0.06
+153,Soulshine,The Allman Brothers Band,rock,chill,0.56,135.6,0.56,0.48,0.12
+154,Golden Years - Single Version [Remastered],David Bowie,rock,happy,0.68,108.5,0.9,0.72,0.37
+155,O,Coldplay,rock,melancholic,0.22,92.0,0.06,0.23,0.91
+156,Clean,Adia Victoria,rock,rebellious,0.43,108.0,0.47,0.59,0.83
+157,Sunburn,Muse,rock,angry,0.91,93.0,0.32,0.47,0.12
+158,Rockero De Noche - Live,Miguel Rios,rock,warm,0.9,95.7,0.78,0.47,0.01
+159,Alien Nation,Scorpions,rock,angry,0.96,97.9,0.33,0.46,0.0
+160,Asian Dreamer,CASIOPEA,rock,laid-back,0.77,138.2,0.76,0.64,0.01
+161,Electric Halo,Kyng,rock,angry,0.86,108.0,0.4,0.54,0.0
+162,Into the Setting Sun,Liam Davison,rock,angry,0.41,85.0,0.05,0.46,0.67
+163,It's A Heartache,Bonnie Tyler,rock,chill,0.66,118.9,0.6,0.51,0.05
+164,Close To Me,The Cure,rock,happy,0.52,185.1,0.96,0.72,0.07
+165,You Sexy Thing,Hot Chocolate,rock,happy,0.73,105.9,0.96,0.79,0.52
+166,Live To Win,Paul Stanley,rock,chill,0.91,127.1,0.49,0.54,0.01
+167,I Am Broken Too,Killswitch Engage,rock,nostalgic,0.97,75.0,0.63,0.42,0.0
+168,Shooting Star (Remastered Album Version),Bad Company,rock,chill,0.64,83.6,0.6,0.55,0.11
+169,Somebody - Remix,Depeche Mode,rock,peaceful,0.44,161.0,0.47,0.28,0.79
+170,Rock Of Ages,Def Leppard,rock,romantic,0.79,105.9,0.64,0.71,0.01
