@@ -169,3 +169,99 @@ id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
 168,Shooting Star (Remastered Album Version),Bad Company,rock,chill,0.64,83.6,0.6,0.55,0.11
 169,Somebody - Remix,Depeche Mode,rock,peaceful,0.44,161.0,0.47,0.28,0.79
 170,Rock Of Ages,Def Leppard,rock,romantic,0.79,105.9,0.64,0.71,0.01
+171,Golden Horizon,The Long Shadows,lofi,relaxed,0.3,70.8,0.61,0.57,0.76
+172,Rusty Echoes,The Ramblers,lofi,nostalgic,0.27,72.7,0.56,0.41,0.79
+173,Rusty Static,Low Fidelity Ghosts,lofi,peaceful,0.37,84.2,0.5,0.23,0.79
+174,Midnight Signal,Nova Kessler,lofi,melancholic,0.29,83.3,0.26,0.39,0.72
+175,Static Signal,Slow Static,lofi,warm,0.4,78.7,0.75,0.54,0.76
+176,Static Skyline,Glass Horizon,ambient,peaceful,0.11,54.6,0.53,0.16,0.84
+177,Golden Curfew,The Long Shadows,ambient,relaxed,0.19,66.7,0.62,0.54,0.91
+178,Broken Alley,Mara Voss,ambient,melancholic,0.13,57.6,0.35,0.41,0.89
+179,Midnight Echoes,Mara Voss,ambient,nostalgic,0.26,66.1,0.54,0.36,0.96
+180,Midnight Skyline,Salt & Sage,ambient,moody,0.18,68.3,0.5,0.68,0.84
+181,Wandering Tide,The Quiet Parade,ambient,warm,0.17,69.9,0.66,0.55,0.93
+182,Golden Highway,Iron Choir,ambient,focused,0.26,58.4,0.51,0.54,0.97
+183,Wandering Horizon,Wren,jazz,chill,0.42,99.2,0.53,0.56,0.72
+184,Rusty Alley,Low Fidelity Ghosts,jazz,romantic,0.25,107.5,0.72,0.7,0.87
+185,Golden Harbor,Pale Fields,jazz,nostalgic,0.29,109.3,0.55,0.43,0.82
+186,Neon Orbit,Salt & Sage,jazz,warm,0.25,116.8,0.74,0.58,0.77
+187,Velvet Static,Glass Horizon,jazz,melancholic,0.27,96.9,0.26,0.43,0.87
+188,Silent Static,Iron Choir,jazz,moody,0.32,114.3,0.49,0.67,0.82
+189,Electric Harbor,The Quiet Parade,jazz,happy,0.5,104.2,0.79,0.8,0.73
+190,Hollow Static,Ivy Hollow,synthwave,energetic,0.56,107.7,0.66,0.8,0.19
+191,Broken Echoes,Ivy Hollow,synthwave,euphoric,0.57,100.5,0.82,0.87,0.08
+192,Distant Static,Salt & Sage,synthwave,intense,0.75,99.4,0.56,0.84,0.13
+193,Paper Echoes,Wren,synthwave,nostalgic,0.57,111.7,0.58,0.36,0.09
+194,Paper Highway,Ember Row,synthwave,chill,0.6,105.6,0.59,0.51,0.21
+195,Golden Echoes,The Ramblers,synthwave,romantic,0.79,116.3,0.73,0.62,0.15
+196,Electric Curfew,Slow Static,synthwave,rebellious,0.59,95.0,0.54,0.64,0.21
+197,Crimson Tide,Salt & Sage,indie pop,warm,0.59,112.4,0.75,0.56,0.34
+198,Faded Echoes,Glass Horizon,indie pop,romantic,0.76,106.7,0.66,0.69,0.3
+199,Hollow Echoes,Glass Horizon,indie pop,nostalgic,0.65,119.6,0.55,0.44,0.25
+200,Midnight Static,The Long Shadows,indie pop,energetic,0.65,121.8,0.63,0.83,0.39
+201,Broken Horizon,Low Fidelity Ghosts,indie pop,chill,0.71,119.1,0.51,0.55,0.33
+202,Silent Reverie,Glass Horizon,indie pop,euphoric,0.77,114.2,0.77,0.93,0.38
+203,Neon Harbor,Wren,indie pop,melancholic,0.78,108.4,0.26,0.36,0.34
+204,Wandering Harbor,Pale Fields,hip hop,rebellious,0.77,85.1,0.56,0.58,0.15
+205,Rusty Signal,Slow Static,hip hop,intense,0.55,99.3,0.61,0.83,0.2
+206,Rusty Horizon,Wren,hip hop,moody,0.57,102.1,0.54,0.7,0.22
+207,Silent Tide,Nova Kessler,hip hop,euphoric,0.56,89.1,0.84,0.95,0.06
+208,Hollow Windows,Static Bloom,hip hop,focused,0.78,102.1,0.54,0.56,0.08
+209,Hollow Alley,Iron Choir,hip hop,angry,0.81,80.6,0.32,0.48,0.24
+210,Hollow Signal,Iron Choir,hip hop,warm,0.79,82.7,0.74,0.59,0.09
+211,Paper Reverie,Cobalt Drift,classical,melancholic,0.31,85.5,0.27,0.42,0.9
+212,Wandering Static,The Long Shadows,classical,romantic,0.19,72.8,0.72,0.68,0.89
+213,Neon Windows,The Long Shadows,classical,nostalgic,0.14,88.7,0.53,0.36,0.91
+214,Midnight Tide,Wren,classical,warm,0.2,75.2,0.68,0.57,0.85
+215,Electric Reverie,Ember Row,classical,moody,0.12,78.2,0.48,0.68,0.96
+216,Crimson Harbor,Ember Row,classical,focused,0.18,79.4,0.56,0.52,0.94
+217,Amber Alley,Cobalt Drift,classical,chill,0.2,84.2,0.53,0.52,0.95
+218,Midnight Compass,Low Fidelity Ghosts,folk,warm,0.31,81.4,0.7,0.59,0.83
+219,Faded Static,Cobalt Drift,folk,peaceful,0.33,94.0,0.53,0.23,0.82
+220,Crimson Static,Pale Fields,folk,melancholic,0.24,76.4,0.35,0.41,0.83
+221,Paper Tide,Pale Fields,folk,chill,0.38,86.5,0.54,0.51,0.81
+222,Golden Tide,Mara Voss,folk,romantic,0.24,103.7,0.7,0.61,0.71
+223,Golden Compass,Nova Kessler,folk,relaxed,0.4,95.0,0.7,0.56,0.87
+224,Paper Alley,Salt & Sage,folk,happy,0.31,97.6,0.83,0.78,0.83
+225,Wandering Compass,Glass Horizon,metal,intense,0.93,149.4,0.58,0.89,0.03
+226,Amber Highway,Pale Fields,metal,rebellious,0.81,156.3,0.55,0.59,0.05
+227,Rusty Curfew,The Ramblers,metal,energetic,0.95,170.6,0.64,0.8,0.07
+228,Amber Tide,Mara Voss,metal,moody,0.89,150.9,0.5,0.69,0.11
+229,Neon Curfew,The Ramblers,metal,angry,0.82,157.1,0.34,0.47,0.05
+230,Paper Orbit,Ivy Hollow,metal,focused,0.94,155.2,0.58,0.58,0.05
+231,Broken Static,The Ramblers,metal,euphoric,0.93,142.1,0.85,0.87,0.03
+232,Velvet Horizon,Mara Voss,house,energetic,0.78,120.2,0.62,0.81,0.11
+233,Electric Compass,The Long Shadows,house,happy,0.88,121.7,0.81,0.82,0.04
+234,Faded Harbor,Wren,house,chill,0.85,129.3,0.56,0.59,0.08
+235,Electric Static,Mara Voss,house,romantic,0.77,127.7,0.74,0.66,0.04
+236,Velvet Reverie,Ember Row,house,intense,0.86,120.7,0.61,0.8,0.08
+237,Distant Windows,Ember Row,house,warm,0.91,126.4,0.73,0.57,0.08
+238,Wandering Orbit,Mara Voss,house,focused,0.89,120.9,0.59,0.52,0.09
+239,Amber Orbit,The Ramblers,country,nostalgic,0.47,94.8,0.55,0.39,0.51
+240,Wandering Signal,The Ramblers,country,happy,0.48,90.7,0.77,0.79,0.59
+241,Distant Compass,The Ramblers,country,melancholic,0.37,91.6,0.32,0.38,0.6
+242,Distant Reverie,Ember Row,country,romantic,0.6,101.5,0.69,0.65,0.53
+243,Electric Orbit,Wren,country,relaxed,0.54,113.5,0.67,0.52,0.63
+244,Golden Skyline,Cobalt Drift,country,rebellious,0.41,90.4,0.5,0.6,0.52
+245,Velvet Harbor,Nova Kessler,country,chill,0.51,107.6,0.51,0.5,0.52
+246,Midnight Alley,Slow Static,reggae,chill,0.41,89.0,0.51,0.51,0.42
+247,Velvet Highway,Nova Kessler,reggae,happy,0.55,90.9,0.76,0.77,0.44
+248,Amber Compass,Low Fidelity Ghosts,reggae,warm,0.42,82.9,0.69,0.56,0.32
+249,Electric Signal,Glass Horizon,reggae,relaxed,0.39,73.8,0.61,0.5,0.41
+250,Distant Harbor,Slow Static,reggae,romantic,0.41,85.6,0.72,0.65,0.47
+251,Wandering Skyline,Ember Row,reggae,peaceful,0.38,74.9,0.51,0.18,0.34
+252,Velvet Alley,Cobalt Drift,reggae,energetic,0.5,88.1,0.69,0.84,0.42
+253,Crimson Curfew,The Long Shadows,blues,moody,0.38,77.3,0.46,0.65,0.56
+254,Neon Static,Mara Voss,blues,nostalgic,0.49,89.3,0.56,0.45,0.7
+255,Wandering Echoes,Iron Choir,blues,romantic,0.37,82.8,0.74,0.62,0.6
+256,Rusty Orbit,Ivy Hollow,blues,relaxed,0.42,90.0,0.63,0.57,0.52
+257,Amber Echoes,Low Fidelity Ghosts,blues,warm,0.27,68.8,0.66,0.58,0.67
+258,Neon Compass,Ember Row,blues,chill,0.26,78.1,0.56,0.55,0.56
+259,Velvet Skyline,The Long Shadows,blues,angry,0.39,92.5,0.29,0.52,0.48
+260,Crimson Horizon,Ember Row,punk,angry,0.82,189.7,0.34,0.5,0.03
+261,Crimson Signal,Ember Row,punk,intense,0.95,189.2,0.57,0.86,0.06
+262,Silent Compass,Salt & Sage,punk,energetic,0.86,172.1,0.65,0.85,0.05
+263,Amber Static,Ember Row,punk,moody,0.81,179.8,0.52,0.73,0.06
+264,Midnight Windows,Low Fidelity Ghosts,punk,euphoric,0.82,186.4,0.75,0.86,0.11
+265,Distant Signal,Ivy Hollow,punk,relaxed,0.91,165.9,0.61,0.53,0.09
+266,Distant Echoes,Glass Horizon,punk,nostalgic,0.84,177.4,0.53,0.37,0.03
