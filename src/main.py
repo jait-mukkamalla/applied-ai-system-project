@@ -11,7 +11,7 @@ You will implement the functions in recommender.py:
 
 import textwrap
 
-from recommender import load_songs, recommend_songs
+from recommender import UserProfile, load_songs, recommend_songs
 
 try:
     from tabulate import tabulate
@@ -27,7 +27,7 @@ def print_recommendations(recommendations) -> None:
     rows = []
     for rank, (song, score, explanation) in enumerate(recommendations, start=1):
         reasons = textwrap.fill(explanation, width=REASON_WRAP_WIDTH)
-        rows.append([rank, song["title"], f"{score:.2f}", reasons])
+        rows.append([rank, song.title, f"{score:.2f}", reasons])
 
     headers = ["#", "Title", "Score", "Reasons"]
 
@@ -72,68 +72,68 @@ def print_recommendations(recommendations) -> None:
 
 USER_PROFILES = {
     # --- Distinct "normal" taste profiles ---
-    "High-Energy Pop": {
-        "genre": "pop",
-        "mood": "happy",
-        "energy": 0.9,
-        "likes_acoustic": False,
-        "mode": "genre_first",
-    },
-    "Chill Lofi": {
-        "genre": "lofi",
-        "mood": "chill",
-        "energy": 0.35,
-        "likes_acoustic": True,
-        "mode": "mood_first",
-    },
-    "Deep Intense Rock": {
-        "genre": "rock",
-        "mood": "intense",
-        "energy": 0.9,
-        "likes_acoustic": False,
-        "mode": "energy_focused",
-    },
+    "High-Energy Pop": UserProfile(
+        favorite_genre="pop",
+        favorite_mood="happy",
+        target_energy=0.9,
+        likes_acoustic=False,
+        mode="genre_first",
+    ),
+    "Chill Lofi": UserProfile(
+        favorite_genre="lofi",
+        favorite_mood="chill",
+        target_energy=0.35,
+        likes_acoustic=True,
+        mode="mood_first",
+    ),
+    "Deep Intense Rock": UserProfile(
+        favorite_genre="rock",
+        favorite_mood="intense",
+        target_energy=0.9,
+        likes_acoustic=False,
+        mode="energy_focused",
+    ),
     # --- Adversarial / edge case profiles ---
-    "Empty Preferences": {},
-    "Nonexistent Genre and Mood": {
-        "genre": "vaporwave-death-polka",
-        "mood": "ecstatic-dread",
-        "energy": 0.5,
-        "likes_acoustic": False,
-    },
-    "Out-of-Range Energy": {
-        "genre": "pop",
-        "mood": "happy",
-        "energy": 5.0,
-        "likes_acoustic": False,
-    },
-    "Negative Energy": {
-        "genre": "metal",
-        "mood": "angry",
-        "energy": -2.0,
-        "likes_acoustic": True,
-    },
-    "Contradictory Acoustic Metal": {
-        "genre": "metal",
-        "mood": "angry",
-        "energy": 0.95,
-        "likes_acoustic": True,
-    },
-    "Invalid Scoring Mode": {
-        "genre": "pop",
-        "mood": "happy",
-        "energy": 0.8,
-        "mode": "vibes_based",
-    },
+    "Empty Preferences": UserProfile(),
+    "Nonexistent Genre and Mood": UserProfile(
+        favorite_genre="vaporwave-death-polka",
+        favorite_mood="ecstatic-dread",
+        target_energy=0.5,
+        likes_acoustic=False,
+    ),
+    "Out-of-Range Energy": UserProfile(
+        favorite_genre="pop",
+        favorite_mood="happy",
+        target_energy=5.0,
+        likes_acoustic=False,
+    ),
+    "Negative Energy": UserProfile(
+        favorite_genre="metal",
+        favorite_mood="angry",
+        target_energy=-2.0,
+        likes_acoustic=True,
+    ),
+    "Contradictory Acoustic Metal": UserProfile(
+        favorite_genre="metal",
+        favorite_mood="angry",
+        target_energy=0.95,
+        likes_acoustic=True,
+    ),
+    "Invalid Scoring Mode": UserProfile(
+        favorite_genre="pop",
+        favorite_mood="happy",
+        target_energy=0.8,
+        mode="vibes_based",
+    ),
 }
 
 
-def run_profile(name: str, user_prefs: dict, songs, k: int = 5) -> None:
+def run_profile(name: str, user: UserProfile, songs, k: int = 5) -> None:
     """Print the recommendations (or the error) produced for a single named profile."""
     print(f"\n=== {name} ===")
-    print(f"user_prefs = {user_prefs}")
+    print(f"user = {user}")
     try:
-        recommendations = recommend_songs(user_prefs, songs, k=k)
+        recommendations = recommend_songs(user, songs, k=k)
         if not recommendations:
             print("(no recommendations returned)")
         else:
@@ -147,8 +147,8 @@ def main() -> None:
     songs = load_songs("data/songs.csv")
     print(f"Loaded songs: {len(songs)}")
 
-    for name, user_prefs in USER_PROFILES.items():
-        run_profile(name, user_prefs, songs, k=5)
+    for name, user in USER_PROFILES.items():
+        run_profile(name, user, songs, k=5)
 
 
 if __name__ == "__main__":

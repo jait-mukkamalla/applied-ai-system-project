@@ -26,12 +26,18 @@ class UserProfile:
     """
     Represents a user's taste preferences.
     Required by tests/test_recommender.py
+
+    All fields are optional with defaults, mirroring the fallbacks
+    score_song previously applied via dict.get(key, default). This is what
+    lets a profile carry only structured prefs, only a free-text query, or
+    both, with no explicit mode flag.
     """
-    favorite_genre: str
-    favorite_mood: str
-    target_energy: float
-    likes_acoustic: bool
+    favorite_genre: Optional[str] = None
+    favorite_mood: Optional[str] = None
+    target_energy: float = 0.5
+    likes_acoustic: bool = False
     mode: str = DEFAULT_MODE
+    query_text: Optional[str] = None
 
 class Recommender:
     """
@@ -43,15 +49,15 @@ class Recommender:
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
         """Return the top k songs recommended for the given user profile."""
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        recommendations = recommend_songs(user, self.songs, k=k)
+        return [song for song, _score, _explanation in recommendations]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
         """Explain why a given song was recommended to the user."""
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        _score, reasons = score_song(user, song)
+        return ", ".join(reasons) if reasons else "No strong matches on your preferences"
 
-def load_songs(csv_path: str) -> List[Dict]:
+def load_songs(csv_path: str) -> List[Song]:
     """
     Loads songs from a CSV file.
     Required by src/main.py
@@ -60,18 +66,18 @@ def load_songs(csv_path: str) -> List[Dict]:
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            song = {
-                "id": int(row["id"]),
-                "title": row["title"],
-                "artist": row["artist"],
-                "genre": row["genre"],
-                "mood": row["mood"],
-                "energy": float(row["energy"]),
-                "tempo_bpm": float(row["tempo_bpm"]),
-                "valence": float(row["valence"]),
-                "danceability": float(row["danceability"]),
-                "acousticness": float(row["acousticness"]),
-            }
+            song = Song(
+                id=int(row["id"]),
+                title=row["title"],
+                artist=row["artist"],
+                genre=row["genre"],
+                mood=row["mood"],
+                energy=float(row["energy"]),
+                tempo_bpm=float(row["tempo_bpm"]),
+                valence=float(row["valence"]),
+                danceability=float(row["danceability"]),
+                acousticness=float(row["acousticness"]),
+            )
             songs.append(song)
     return songs
 
@@ -134,7 +140,7 @@ WEIGHT_PRESETS = {
     },
 }
 
-def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
+def score_song(user: UserProfile, song: Song) -> Tuple[float, List[str]]:
     """
     Scores a single song against user preferences.
     Required by recommend_songs() and src/main.py
@@ -146,30 +152,30 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
       - acousticness: acousticness if likes_acoustic else (1 - acousticness)
       score = 100 * sum(weight_i * match_i)
 
-    user_prefs["mode"] selects which entry of WEIGHT_PRESETS to weight the
+    user.mode selects which entry of WEIGHT_PRESETS to weight the
     features by (e.g. "genre_first", "mood_first", "energy_focused");
     defaults to DEFAULT_MODE ("balanced") when absent.
     """
-    mode = user_prefs.get("mode", DEFAULT_MODE)
+    mode = user.mode
     if mode not in WEIGHT_PRESETS:
         valid = ", ".join(sorted(WEIGHT_PRESETS))
         raise ValueError(f"Unknown scoring mode '{mode}'. Valid modes: {valid}")
     weights = WEIGHT_PRESETS[mode]
 
-    favorite_genre = user_prefs.get("genre")
-    favorite_mood = user_prefs.get("mood")
-    target_energy = user_prefs.get("energy", 0.5)
-    likes_acoustic = user_prefs.get("likes_acoustic", False)
+    favorite_genre = user.favorite_genre
+    favorite_mood = user.favorite_mood
+    target_energy = user.target_energy
+    likes_acoustic = user.likes_acoustic
 
     valence_target, danceability_target = MOOD_TARGETS.get(favorite_mood, DEFAULT_MOOD_TARGET)
 
-    genre_match = 1.0 if song.get("genre") == favorite_genre else 0.0
-    mood_match = 1.0 if song.get("mood") == favorite_mood else 0.0
-    energy_match = 1.0 - abs(song.get("energy", 0.0) - target_energy)
-    valence_match = 1.0 - abs(song.get("valence", 0.0) - valence_target)
-    danceability_match = 1.0 - abs(song.get("danceability", 0.0) - danceability_target)
+    genre_match = 1.0 if song.genre == favorite_genre else 0.0
+    mood_match = 1.0 if song.mood == favorite_mood else 0.0
+    energy_match = 1.0 - abs(song.energy - target_energy)
+    valence_match = 1.0 - abs(song.valence - valence_target)
+    danceability_match = 1.0 - abs(song.danceability - danceability_target)
 
-    acousticness = song.get("acousticness", 0.0)
+    acousticness = song.acousticness
     acousticness_match = acousticness if likes_acoustic else (1.0 - acousticness)
 
     matches = {
@@ -185,11 +191,11 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     score = round(sum(contributions.values()) * 100, 2)
 
     reason_templates = {
-        "genre": lambda: f"genre '{song.get('genre')}' matches your favorite genre",
-        "mood": lambda: f"mood '{song.get('mood')}' matches your favorite mood",
-        "energy": lambda: f"energy {song.get('energy'):.2f} is close to your target {target_energy:.2f}",
-        "valence": lambda: f"valence {song.get('valence'):.2f} fits the '{favorite_mood}' mood profile",
-        "danceability": lambda: f"danceability {song.get('danceability'):.2f} fits the '{favorite_mood}' mood profile",
+        "genre": lambda: f"genre '{song.genre}' matches your favorite genre",
+        "mood": lambda: f"mood '{song.mood}' matches your favorite mood",
+        "energy": lambda: f"energy {song.energy:.2f} is close to your target {target_energy:.2f}",
+        "valence": lambda: f"valence {song.valence:.2f} fits the '{favorite_mood}' mood profile",
+        "danceability": lambda: f"danceability {song.danceability:.2f} fits the '{favorite_mood}' mood profile",
         "acousticness": lambda: (
             f"acousticness {acousticness:.2f} matches your preference for acoustic tracks"
             if likes_acoustic
@@ -204,7 +210,7 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
 
 MAX_SONGS_PER_ARTIST = 2
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
+def recommend_songs(user: UserProfile, songs: List[Song], k: int = 5) -> List[Tuple[Song, float, str]]:
     """
     Functional implementation of the recommendation logic.
     Required by src/main.py
@@ -212,22 +218,22 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tup
     Scores every song, ranks highest-to-lowest, then applies a diversity cap
     so no artist appears more than MAX_SONGS_PER_ARTIST times in the top k.
 
-    user_prefs["mode"] (see score_song) selects the scoring weight preset.
+    user.mode (see score_song) selects the scoring weight preset.
     """
     scored = sorted(
-        ((song, *score_song(user_prefs, song)) for song in songs),
+        ((song, *score_song(user, song)) for song in songs),
         key=lambda scored_song: scored_song[1],
         reverse=True,
     )
 
     artist_counts: Dict[str, int] = {}
-    recommendations: List[Tuple[Dict, float, str]] = []
+    recommendations: List[Tuple[Song, float, str]] = []
 
     for song, score, reasons in scored:
         if len(recommendations) == k:
             break
 
-        artist = song.get("artist")
+        artist = song.artist
         if artist_counts.get(artist, 0) >= MAX_SONGS_PER_ARTIST:
             continue
 
