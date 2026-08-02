@@ -1,4 +1,6 @@
+chromadb
 pandas
 pytest
+sentence-transformers
 streamlit
 tabulate

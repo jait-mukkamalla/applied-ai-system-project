@@ -13,3 +13,6 @@ venv/
 
 # Pytest cache
 .pytest_cache/
+
+# Persisted Chroma vector store (rebuilt from CSV/RAG, not source data)
+data/chroma/
