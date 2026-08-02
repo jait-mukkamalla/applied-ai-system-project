@@ -308,3 +308,43 @@ def recommend_songs(user: UserProfile, songs: List[Song], k: int = 5) -> List[Tu
         artist_counts[artist] = artist_counts.get(artist, 0) + 1
 
     return recommendations
+
+# How many candidates search_similar retrieves before recommend_songs ranks
+# and diversity-caps them down to k. Needs headroom above k so structured
+# scoring/diversity capping has room to reorder within the semantic matches,
+# not just rubber-stamp the embedding similarity order.
+DEFAULT_RETRIEVAL_POOL_SIZE = 20
+
+def get_recommendations(
+    user: UserProfile,
+    songs: List[Song],
+    k: int = 5,
+    retrieval_pool_size: int = DEFAULT_RETRIEVAL_POOL_SIZE,
+) -> List[Tuple[Song, float, str]]:
+    """
+    Single entry point for producing recommendations, regardless of whether
+    a profile carries structured prefs, a free-text query, or both.
+
+    Mode is inferred from which fields are populated, not an explicit flag:
+    if user.query_text is set, it's used to semantically narrow `songs` to
+    a candidate pool via the vector store first. recommend_songs (structured
+    scoring + diversity cap) always runs afterward, unchanged, over whatever
+    candidate pool results. Callers (src/main.py, the Streamlit app) never
+    need to branch on mode themselves.
+
+    Retrieval is a pre-filter, not a scoring replacement: if it can't narrow
+    anything (e.g. an empty/unpopulated vector store), scoring falls back to
+    the full `songs` list rather than silently returning zero recommendations.
+    """
+    candidate_pool = songs
+
+    if user.query_text:
+        try:
+            from vector_store import search_similar
+        except ImportError:
+            from src.vector_store import search_similar
+
+        pool_size = max(retrieval_pool_size, k)
+        candidate_pool = search_similar(user.query_text, k=pool_size) or songs
+
+    return recommend_songs(user, candidate_pool, k=k)
