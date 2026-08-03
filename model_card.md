@@ -1,72 +1,33 @@
-# 🎧 Model Card: Music Recommender Simulation
+# 🎧 Model Card: 🎵 Tunecraft
 
-## 1. Model Name  
+## Intended Use
 
-**BeatsBlender 1.0**  
+Tunecraft is intended for individual listeners who want personalized, explained song recommendations based on structured taste (genre, mood, energy, acoustic preference) or a free-text description of a vibe. It is meant for casual, single-session discovery, not for production-scale music streaming or commercial licensing decisions. The tool is best suited for users exploring a bounded dataset of curated/public songs rather than the full commercial music catalog.
 
----
+## Model Structure
 
-## 2. Intended Use  
+Tunecraft is not a trained ML model; it's a rule-based content scorer combined with a retrieval-augmented pipeline. A `UserProfile` is scored against song metadata (genre, mood, energy, valence, danceability) using weighted feature matching, with an artist cap for diversity. Optional free-text input is embedded and matched via ChromaDB semantic search to narrow the candidate pool before scoring.
 
-This recommender suggests songs from a small sample catalog based on a listener's stated taste — favorite genre, favorite mood, desired energy level, and whether they like acoustic songs. It assumes the listener can describe their taste in these simple terms, and that their taste stays fairly consistent (it does not learn or adapt over time). This is a classroom exploration project, not a system built for real users or a real music catalog.
+## Limitations and Biases
 
----
+The system's accuracy is capped by the quality and coverage of its underlying CSV dataset, so niche genres or moods with few songs will yield weaker matches. Because scoring relies on hand-picked feature weights rather than learned preferences, it cannot adapt to individual listening history or nuanced taste over time. Semantic search quality also depends on the embedding model's ability to interpret informal, slang-heavy, or ambiguous vibe descriptions.
 
-## 3. How the Model Works  
+## Potential Misuses and Their Prevention
 
-Every song has a genre, a mood, an energy level, and a few other traits like how "danceable" or "acoustic" it sounds. The listener tells the system their favorite genre, favorite mood, how much energy they want, and whether they like acoustic songs. The system compares each song to those preferences: exact matches on genre and mood score well, and energy/mood-related traits score well when they're numerically close to what the listener asked for. All of that gets combined into a single score out of 100, and the songs are sorted from best match to worst. I added a setting that lets the listener say which of those traits matters most to them (for example, someone can say genre matters most, or energy matters most), and I added a rule that stops any one artist from taking over the list, so the results feel a bit more varied.
-
----
-
-## 4. Data  
-
-The catalog is a small, made-up list of 20 songs covering genres like pop, lofi, rock, metal, and a few others, each tagged with a mood (like happy, chill, or angry) and numeric traits for energy, valence, danceability, and acousticness. I used the starter dataset as-is without adding or removing songs. Most genres only have one song each — pop is the only genre with two — so the catalog can't really represent the full range of any genre's variety, and things like lyrics, vocal style, or instrumentation aren't captured at all.
+The tool could be misused to scrape or bulk-export the underlying song dataset rather than for its intended one-off recommendation use; it is not designed for high-volume automated querying. Adversarial or nonsensical inputs (invalid modes, out-of-range values) are sanitized and clamped so they cannot crash the app or produce misleading output. Since results are drawn from a public, non-authoritative dataset, they should not be treated as licensed music metadata or used for commercial cataloging.
 
 ---
 
-## 5. Strengths  
+## AI Collaboration
 
-The system works well for listeners with a clear, well-represented taste, like a high-energy pop fan or a chill lofi fan — their top picks are genuinely a good match, and the reasons given for each pick make sense. It also correctly tells apart listeners who want similar energy levels but different moods, for example separating a "happy" high-energy fan from an "intense" high-energy fan even though both want loud, energetic songs. The artist cap also does its job: no single artist crowds out the results, even when they have several high-scoring songs.
+A lot of my interactions and collaboration with AI (Claude Code) during this project was based on system design. I often had a pre-existing idea in my mind that I presented to Claude and asked for its own thoughts and suggestions. This iterative feedback loop between me and the AI process helped me improve my overall design of the system and significantly helped me whenever I ran into any doubts. If I ever had a question, I would ask Claude to present me with design options with their pros and cons so that I could make the best choice for the system I was envisioning.
 
----
+AI was very helpful with giving suggestions regarding the creation of the RAG pipeline, vector database, and semantic search features. I am not the most knowledgeable in these areas yet, but with the help of Claude I was able to make decisions such as what vector database I should use to support a large amount of songs.
 
-## 6. Limitations and Bias 
-
-The system does not consider lyrics, vocals, tempo, or anything about the actual sound of a song — only its labeled genre, mood, and a handful of numeric traits. Genre and mood require an exact match, so listeners with tastes close to but not exactly matching a label (e.g. "chill" instead of "relaxed") are never matched well. It also does not validate most inputs, so out-of-range values (like an energy above 1) produce broken, misleading scores instead of an error.
-
-**Finding from experiments:** the system quietly favors pop fans, because pop is the only genre with two songs in our small catalog, while every other genre only has one. That means a pop fan is the only person who can get a results list full of songs that truly match their taste, while a fan of any other genre gets one real match at most, and the rest of their list is filled in with songs from completely different genres that just happen to have a similar mood or energy level. When I tested this by making genre matter a lot more for a rock fan, it only kept that one rock song reliably at the top, and everything after it was a random-feeling mix of other genres rather than music an actual rock fan would want. This is a small example of a filter bubble caused by an unbalanced music collection rather than anything about the listener, and it would be worth fixing by having the system recognize similar genres instead of only rewarding an exact match, so that genres with few songs aren't unfairly overlooked.
+AI did often struggle to remember the generated plan I was carrying throughout the same or multiple conversations. I created a 7 step execution plan after working on my design plan with Claude for about an hour. The generated text script had all the information needed to make the entire application in one go. However, I decided to move through the project one step at a time to ensure everything was working. When I got to the vector database portion of implementation, the AI kept suggesting to use an API key for an OpenAI model or the Spotify API despite the prior given decision of using RAG and a vector database to support the recommender system. I just had to correct it and continue on with my plan.
 
 ---
 
-## 7. Evaluation  
+## Model Reliability Surprises
 
-I tested nine made-up listeners: three normal ones meant to represent real people (a high-energy pop fan, a chill lofi fan, and a deep intense rock fan) and six "break it if you can" listeners meant to poke at the edges of the system (a completely blank listener with no preferences at all, a listener who typed in a made-up genre and mood, a listener who asked for an energy level way above what's possible, a listener who asked for a negative energy level, a listener who asked for angry metal but also said they like acoustic songs, and a listener who typed in a scoring mode that doesn't exist). For each one I looked at whether the top few picks actually made sense for that kind of listener, and whether the reasons given for each pick lined up with what I'd expect a real person to hear in that song.
-
-The pop fan's list was upbeat and high-energy; the lofi fan's was slow and mellow — the two asked for opposite energy and mood, and the system told them apart correctly. The pop fan and rock fan both wanted high energy and shared a couple of loud songs, but the rock fan's top pick was moody and aggressive while the pop fan's was bright and cheerful, so the system is also picking up on "happy" versus "intense," not just loudness.
-
-The biggest surprise: the blank listener and the listener with a made-up genre and mood got almost identical lists. I expected "said nothing" and "said something unrecognized" to behave differently, but both silently fall back to the same generic playlist with no warning that the request wasn't understood. The two out-of-bounds energy listeners (too high, negative) both produced negative-looking scores instead of an error — flipping the direction only changed which songs filled out the bottom of the list, not the underlying problem, so there's no real sanity check on numbers outside the expected 0-to-1 range.
-
-The rock fan and the "contradictory acoustic metal" listener (same angry/intense style, but also wants acoustic songs, which barely exist in that style) landed on the same top pick — genre, mood, and energy outweighed the acoustic request, so the contradiction just quietly lost out instead of causing confusion. By contrast, the listener who typed a scoring mode that doesn't exist was the only one the system actually stopped for with an error, rather than guessing or falling back to a default like it does for every other bad input — the system is inconsistent about which mistakes it catches.
-
----
-
-## 8. Future Work  
-
-Ideas for how you would improve the model next.  
-
-- Implement a RAG system that could pull songs off of the interent or a some other data source to diversify and increase song data
-- Build more validations checks for user profile input
-- Connect the model to Streamlit to create a interactive user application similar to spotify (data validation would be needed for sure here)
-
----
-
-## 9. Personal Reflection  
-
-I learnt a lot from the research portion at the beginning of this project about how real recommendation systems function.
-
-All though this simple model only used weights and normalized vaues for song features to generate recommendations, it still felt like it was a small scale recommendation engine due to its ability to provide scores and reasoning behind the rankings of songs.
-
-As I went through this project, I realized that these systems are heavily subjected the discretion of the creator due to the constant decision of features vs tradeoffs. This was definitely a fun project, and I see how ML/AI systems are useful in creating recommendation systems as tech evolves.
-
-Throughout the building process, I used AI to implement code, visual the flow of data across functions and files, and draft various versions of new model functions.
-I felt that I mostly did architectural work and creative design. The AI agent did sometimes need corrections to make the code more 'Pythonic" (modular / concise).
+It was very difficult to get the model to fail obtaining recommended songs when testing the Streamlit app. The model always has enough scored songs to return a ranked list, even under adversarial profiles like invalid scoring modes, empty preferences, or contradictory inputs. This surprised me since I expected edge cases to require more explicit fallback handling; instead, the sanitization and scoring logic absorbed most of them gracefully. The one place reliability did dip was semantic search response time, which slowed noticeably as the RAG-loaded song pool grew larger.

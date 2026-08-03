@@ -1,402 +1,142 @@
-# 🎵 Music Recommender Simulation
+# 🎵 Tunecraft - My Applied AI System Project
 
-## Project Summary
+Tunecraft is a content-based music recommender with a Streamlit UI. It scores songs (from a local CSV, a live RAG fetch, or both) against a listener's stated taste — genre, mood, energy, acoustic preference, or a free-text vibe — and returns a ranked, explained playlist. An artist cap keeps results varied, and semantic search narrows the pool when the listener describes a mood in their own words.
 
-A small content-based music recommender. It scores a catalog of songs against a listener's stated taste (genre, mood, energy, acoustic preference), ranks them, and returns the top matches with a plain-language explanation for each pick. An artist cap (max 2 songs per artist) keeps results varied.
 
----
+## Project I Expanded: 🎵 Music Recommender Simulation (Project #3)
 
-## How The System Works
-
-Real-world recommenders combine collaborative filtering (recommends based on similar users) and content-based filtering (recommends based on item features compared to what a user already likes). This project uses **content-based filtering**, since it works entirely from song features.
-
-### Song features (10 attributes)
-
-- `id`, `title`, `artist` — metadata only, not used in scoring
-- `genre`, `mood` — categorical
-- `energy`, `valence`, `danceability`, `acousticness` — floats, 0 to 1
-- `tempo_bpm` — loaded but not used in scoring
-
-### UserProfile fields
-
-- `favorite_genre` / `favorite_mood` — matched exactly; mood also looks up a target `valence`/`danceability` pair
-- `target_energy` — desired energy level (0 to 1)
-- `likes_acoustic` — flips whether high or low acousticness scores better
-- `mode` — weight preset: `balanced`, `genre_first`, `mood_first`, or `energy_focused`
-
-### Scoring
-
-For each song, five match values are computed and combined using weights from the selected mode (weights sum to 1.0), then scaled to 0–100:
-
-- `genre_match` / `mood_match` — 1.0 exact match, else 0.0
-- `energy_match` — `1 - abs(song.energy - target_energy)`
-- `valence_match` / `danceability_match` — `1 - abs(song.value - mood-implied target)`
-- `acousticness_match` — acousticness if user likes acoustic, else `1 - acousticness`
-
-Songs are sorted by score, then the top `k` are selected, skipping any song that would push an artist past 2 appearances. Each recommendation includes an explanation built from its top 3 contributing features.
-
-**Known bias:** genre and mood require exact matches, so close-but-different tastes (e.g. "chill" vs. "relaxed") are never surfaced — this narrows discovery rather than encouraging it.
+A small content-based music recommender based in the terminal (CLI). It scores a catalog of songs against a listener's stated taste (genre, mood, energy, acoustic preference), ranks them, and returns the top matches with a plain-language explanation for each pick. An artist cap (max 2 songs per artist) keeps results varied.
 
 ---
 
-## Getting Started
+## Architecture Overview
 
-### Setup
+![Architecture diagram](diagrams/assets/mermaid-diagram-2026-08-02-134440.png)
 
-1. Create a virtual environment (optional):
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate      # Mac or Linux
-   .venv\Scripts\activate         # Windows
-   ```
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Run the app:
-   ```bash
-   python -m src.main
-   ```
+The Streamlit UI collects a `UserProfile`, which flows into `get_recommendations()`. If free text is present, the vector store semantically narrows the song pool first; the structured scorer then ranks (and diversity-caps) whatever pool it receives — CSV, RAG, or combined. The selected ranked songs are then sent to the Streamlit UI for the user to see.
 
-### Running Tests
+---
+
+## Design Decisions
+
+The first big decision I ended up making during this extension project was deciding to use only a dataclass implementation of user profiles and songs instead of also having a dictionary implementation in half my codebase. This was prompted by the feedback I received for the project I extended, the 'Music Recommender Simulation.' This decision helped my code be more maintainable, understandable to new users / fellow coders, and align with proper software engineering principles.
+
+The next big design decision was how I wanted to implement my RAG system. I decided to use a pre-labeled CSV of 32,000 songs available on the internet as my large data source. The songs are pulled from the url of this CSV and then converted into dataclass objects that can be used by the recommender and semantic search files.
+
+I then decided that I wanted to store songs in a vector database to allow for an additional feature for my RAG system. I chose to use ChromaDB instead of a lighter weight data storage option because I wanted the option for the user to load as many songs as they wanted from the RAG data source. While this increases the chance of users finding songs that closely fit their user profile, it results in a slow response from the UI until the data is loaded.
+
+The last major design decision I made was to upgrade the CLI-based recommender to a functional app using Streamlit. I connected Streamlit with the song recommender system, altered the color schema & layout, and added an extra layer of failure fallbacks to ensure a good user experience. 
+
+---
+
+## RAG Enhancement
+
+On top of the RAG pipeline built to obtain songs to widen our data pool, I added a semantic query feature to the app that uses the embedded vectors of all the songs to find songs that match a described vibe from the user. The user can choose what data sources the app uses (CSV, RAG, or both together) and the methodology the recommender uses to find relevant songs (user profile, semantic query, or both). I added this feature because sometimes it is very hard to find songs that match your current vibe without having to go to the internet and experiment until you finally find what you're looking for. While this feature can be very useful for many users, it does take the semantic query function a while to compute and select songs to send to the recommender depending on the number of songs in the database at that time.
+
+---
+
+## Setup Instructions
+
+> ⚠️ The first run will be slow — it needs to embed the entire song pool into the vector store for RAG/semantic search before it can serve any recommendations. Subsequent runs are fast since the index is cached.
 
 ```bash
-pytest
-```
+# 1. Install dependencies
+pip install -r requirements.txt
 
-Add more tests in `tests/test_recommender.py`.
-
----
-
-## Sample Recommendation Output
-
-```
-Loaded songs: 20
-
-Top recommendations:
-
-+-----+----------------+---------+----------------------------------------------------+
-| #   | Title          | Score   | Reasons                                            |
-+=====+================+=========+====================================================+
-| 1   | Sunrise City   | 97.10   | genre 'pop' matches your favorite genre, mood      |
-|     |                |         | 'happy' matches your favorite mood, energy 0.82 is |
-|     |                |         | close to your target 0.80                          |
-+-----+----------------+---------+----------------------------------------------------+
-| 2   | Gym Hero       | 75.65   | genre 'pop' matches your favorite genre, energy    |
-|     |                |         | 0.93 is close to your target 0.80, valence 0.77    |
-|     |                |         | fits the 'happy' mood profile                      |
-+-----+----------------+---------+----------------------------------------------------+
-| 3   | Rooftop Lights | 70.35   | mood 'happy' matches your favorite mood, energy    |
-|     |                |         | 0.76 is close to your target 0.80, valence 0.81    |
-|     |                |         | fits the 'happy' mood profile                      |
-+-----+----------------+---------+----------------------------------------------------+
-| 4   | Neon Horizon   | 51.90   | energy 0.88 is close to your target 0.80, valence  |
-|     |                |         | 0.80 fits the 'happy' mood profile, acousticness   |
-|     |                |         | 0.05 matches your preference for non-acoustic      |
-|     |                |         | tracks                                             |
-+-----+----------------+---------+----------------------------------------------------+
-| 5   | Concrete Kings | 50.15   | energy 0.85 is close to your target 0.80, valence  |
-|     |                |         | 0.65 fits the 'happy' mood profile, danceability   |
-|     |                |         | 0.88 fits the 'happy' mood profile                 |
-+-----+----------------+---------+----------------------------------------------------+
+# 2. Run the Streamlit app
+streamlit run streamlit_app.py
 ```
 
 ---
 
-## Experiments You Tried
+## Sample Interactions
 
-`src/main.py` defines `USER_PROFILES` — three normal taste profiles and five adversarial/edge-case profiles — all run through `recommend_songs` against the sample catalog.
+**Example 1 — Structured preferences only**
 
-### Normal profiles
+| Input | Value |
+|---|---|
+| Favorite genre | `pop` |
+| Favorite mood | `happy` |
+| Target energy | `0.75` |
+| I like acoustic tracks | ☐ |
+| Scoring mode | `balanced` |
 
-- **High-Energy Pop** (`genre_first`, target energy 0.9): correctly ranked both `pop` songs first, since the boosted genre weight (0.45) dominated.
+Output:
+> 🥇 **Levitating** — Dua Lipa (94.2)
+> *genre 'pop' matches your favorite genre, mood 'happy' matches your favorite mood, energy 0.78 is close to your target 0.75*
+>
+> 🥈 **Good as Hell** — Lizzo (91.7)
+> *genre 'pop' matches your favorite genre, mood 'happy' matches your favorite mood, danceability 0.82 fits the 'happy' mood profile*
+>
+> 🥉 **Sunflower** — Post Malone (89.3)
+> *genre 'pop' matches your favorite genre, energy 0.71 is close to your target 0.75, valence 0.76 fits the 'happy' mood profile*
 
-```
-=== High-Energy Pop ===
-user_prefs = {'genre': 'pop', 'mood': 'happy', 'energy': 0.9, 'likes_acoustic': False, 'mode': 'genre_first'}
-+-----+----------------+---------+----------------------------------------------------+
-| #   | Title          | Score   | Reasons                                            |
-+=====+================+=========+====================================================+
-| 1   | Sunrise City   | 96.97   | genre 'pop' matches your favorite genre, mood      |
-|     |                |         | 'happy' matches your favorite mood, energy 0.82 is |
-|     |                |         | close to your target 0.90                          |
-+-----+----------------+---------+----------------------------------------------------+
-| 2   | Gym Hero       | 83.28   | genre 'pop' matches your favorite genre, energy    |
-|     |                |         | 0.93 is close to your target 0.90, valence 0.77    |
-|     |                |         | fits the 'happy' mood profile                      |
-+-----+----------------+---------+----------------------------------------------------+
-| 3   | Rooftop Lights | 50.02   | mood 'happy' matches your favorite mood, energy    |
-|     |                |         | 0.76 is close to your target 0.90, valence 0.81    |
-|     |                |         | fits the 'happy' mood profile                      |
-+-----+----------------+---------+----------------------------------------------------+
-| 4   | Neon Horizon   | 38.57   | energy 0.88 is close to your target 0.90, valence  |
-|     |                |         | 0.80 fits the 'happy' mood profile, acousticness   |
-|     |                |         | 0.05 matches your preference for non-acoustic      |
-|     |                |         | tracks                                             |
-+-----+----------------+---------+----------------------------------------------------+
-| 5   | Concrete Kings | 36.55   | energy 0.85 is close to your target 0.90, valence  |
-|     |                |         | 0.65 fits the 'happy' mood profile, danceability   |
-|     |                |         | 0.88 fits the 'happy' mood profile                 |
-+-----+----------------+---------+----------------------------------------------------+
-```
+**Example 2 — Free-text vibe only**
 
-- **Chill Lofi** (`mood_first`, likes acoustic, target energy 0.35): both `lofi` tracks ranked highest; mood/valence weighting pulled a thematically-similar ambient track above unrelated genres.
+| Input | Value |
+|---|---|
+| Describe what you're in the mood for | `late-night driving music with a dreamy vibe` |
 
-```
-=== Chill Lofi ===
-user_prefs = {'genre': 'lofi', 'mood': 'chill', 'energy': 0.35, 'likes_acoustic': True, 'mode': 'mood_first'}
-+-----+--------------------+---------+----------------------------------------------------+
-| #   | Title              | Score   | Reasons                                            |
-+=====+====================+=========+====================================================+
-| 1   | Library Rain       | 98.00   | mood 'chill' matches your favorite mood, valence   |
-|     |                    |         | 0.60 fits the 'chill' mood profile, genre 'lofi'   |
-|     |                    |         | matches your favorite genre                        |
-+-----+--------------------+---------+----------------------------------------------------+
-| 2   | Midnight Coding    | 96.95   | mood 'chill' matches your favorite mood, valence   |
-|     |                    |         | 0.56 fits the 'chill' mood profile, genre 'lofi'   |
-|     |                    |         | matches your favorite genre                        |
-+-----+--------------------+---------+----------------------------------------------------+
-| 3   | Spacewalk Thoughts | 80.50   | mood 'chill' matches your favorite mood, valence   |
-|     |                    |         | 0.65 fits the 'chill' mood profile, energy 0.28 is |
-|     |                    |         | close to your target 0.35                          |
-+-----+--------------------+---------+----------------------------------------------------+
-| 4   | Focus Flow         | 57.10   | valence 0.59 fits the 'chill' mood profile, genre  |
-|     |                    |         | 'lofi' matches your favorite genre, danceability   |
-|     |                    |         | 0.60 fits the 'chill' mood profile                 |
-+-----+--------------------+---------+----------------------------------------------------+
-| 5   | Old Porch Stories  | 41.30   | valence 0.58 fits the 'chill' mood profile, energy |
-|     |                    |         | 0.33 is close to your target 0.35, danceability    |
-|     |                    |         | 0.35 fits the 'chill' mood profile                 |
-+-----+--------------------+---------+----------------------------------------------------+
-```
+Output:
+> 🥈 **Night Drive** — The Midnight (88.6)
+> *mood 'moody' matches your favorite mood, valence 0.42 fits the 'moody' mood profile, danceability 0.61 fits the 'moody' mood profile*
+>
+> 🥉 **Nightcall** — Kavinsky (85.9)
+> *mood 'moody' matches your favorite mood, valence 0.38 fits the 'moody' mood profile, energy 0.55 is close to your target 0.50*
+>
+> 4. **Instant Crush** — Daft Punk ft. Julian Casablancas (83.1)
+> *valence 0.45 fits the 'moody' mood profile, danceability 0.58 fits the 'moody' mood profile, energy 0.60 is close to your target 0.50*
 
-- **Deep Intense Rock** (`energy_focused`, target energy 0.9): the one true `rock`+`intense` song ranked first, but de-emphasized genre/mood let several unrelated high-energy tracks crowd the top 5.
+**Example 3 — Mismatched/uncommon preferences**
 
-```
-=== Deep Intense Rock ===
-user_prefs = {'genre': 'rock', 'mood': 'intense', 'energy': 0.9, 'likes_acoustic': False, 'mode': 'energy_focused'}
-+-----+----------------+---------+----------------------------------------------------+
-| #   | Title          | Score   | Reasons                                            |
-+=====+================+=========+====================================================+
-| 1   | Storm Runner   | 93.50   | energy 0.91 is close to your target 0.90,          |
-|     |                |         | danceability 0.66 fits the 'intense' mood profile, |
-|     |                |         | valence 0.48 fits the 'intense' mood profile       |
-+-----+----------------+---------+----------------------------------------------------+
-| 2   | Gym Hero       | 85.40   | energy 0.93 is close to your target 0.90,          |
-|     |                |         | danceability 0.88 fits the 'intense' mood profile, |
-|     |                |         | valence 0.77 fits the 'intense' mood profile       |
-+-----+----------------+---------+----------------------------------------------------+
-| 3   | Concrete Kings | 76.25   | energy 0.85 is close to your target 0.90,          |
-|     |                |         | danceability 0.88 fits the 'intense' mood profile, |
-|     |                |         | valence 0.65 fits the 'intense' mood profile       |
-+-----+----------------+---------+----------------------------------------------------+
-| 4   | Neon Horizon   | 74.95   | energy 0.88 is close to your target 0.90,          |
-|     |                |         | danceability 0.90 fits the 'intense' mood profile, |
-|     |                |         | valence 0.80 fits the 'intense' mood profile       |
-+-----+----------------+---------+----------------------------------------------------+
-| 5   | Broken Curfew  | 72.00   | energy 0.95 is close to your target 0.90,          |
-|     |                |         | danceability 0.60 fits the 'intense' mood profile, |
-|     |                |         | valence 0.55 fits the 'intense' mood profile       |
-+-----+----------------+---------+----------------------------------------------------+
-```
+| Input | Value |
+|---|---|
+| Favorite genre | `classical` |
+| Favorite mood | `angry` |
+| Target energy | `0.10` |
 
-### Adversarial / edge-case profiles
-
-- **Empty Preferences** (`{}`): didn't crash — every field fell back to a default, producing a generic "middle of the road" playlist with no warning that no real preferences were given. The explanation text even leaked `'None' mood profile` to the user.
-
-```
-=== Empty Preferences ===
-user_prefs = {}
-+-----+-----------------+---------+---------------------------------------------------+
-| #   | Title           | Score   | Reasons                                           |
-+=====+=================+=========+===================================================+
-| 1   | Velvet Whisper  | 48.70   | energy 0.55 is close to your target 0.50, valence |
-|     |                 |         | 0.70 fits the 'None' mood profile, danceability   |
-|     |                 |         | 0.68 fits the 'None' mood profile                 |
-+-----+-----------------+---------+---------------------------------------------------+
-| 2   | Island Sway     | 46.75   | energy 0.45 is close to your target 0.50, valence |
-|     |                 |         | 0.75 fits the 'None' mood profile, danceability   |
-|     |                 |         | 0.70 fits the 'None' mood profile                 |
-+-----+-----------------+---------+---------------------------------------------------+
-| 3   | Backroad Sunset | 46.70   | energy 0.50 is close to your target 0.50, valence |
-|     |                 |         | 0.72 fits the 'None' mood profile, danceability   |
-|     |                 |         | 0.55 fits the 'None' mood profile                 |
-+-----+-----------------+---------+---------------------------------------------------+
-| 4   | Midnight Coding | 45.50   | energy 0.42 is close to your target 0.50, valence |
-|     |                 |         | 0.56 fits the 'None' mood profile, danceability   |
-|     |                 |         | 0.62 fits the 'None' mood profile                 |
-+-----+-----------------+---------+---------------------------------------------------+
-| 5   | Focus Flow      | 45.05   | energy 0.40 is close to your target 0.50, valence |
-|     |                 |         | 0.59 fits the 'None' mood profile, danceability   |
-|     |                 |         | 0.60 fits the 'None' mood profile                 |
-+-----+-----------------+---------+---------------------------------------------------+
-```
-
-- **Nonexistent Genre/Mood** (made-up strings): behaved almost identically to the empty-preferences case, since unrecognized moods silently fall back to a default and unmatched genres just score 0 — but the explanation text confidently echoed the made-up mood back, implying false understanding.
-
-```
-=== Nonexistent Genre and Mood ===
-user_prefs = {'genre': 'vaporwave-death-polka', 'mood': 'ecstatic-dread', 'energy': 0.5, 'likes_acoustic': False}
-+-----+-----------------+---------+---------------------------------------------------+
-| #   | Title           | Score   | Reasons                                           |
-+=====+=================+=========+===================================================+
-| 1   | Velvet Whisper  | 48.70   | energy 0.55 is close to your target 0.50, valence |
-|     |                 |         | 0.70 fits the 'ecstatic-dread' mood profile,      |
-|     |                 |         | danceability 0.68 fits the 'ecstatic-dread' mood  |
-|     |                 |         | profile                                           |
-+-----+-----------------+---------+---------------------------------------------------+
-| 2   | Island Sway     | 46.75   | energy 0.45 is close to your target 0.50, valence |
-|     |                 |         | 0.75 fits the 'ecstatic-dread' mood profile,      |
-|     |                 |         | danceability 0.70 fits the 'ecstatic-dread' mood  |
-|     |                 |         | profile                                           |
-+-----+-----------------+---------+---------------------------------------------------+
-| 3   | Backroad Sunset | 46.70   | energy 0.50 is close to your target 0.50, valence |
-|     |                 |         | 0.72 fits the 'ecstatic-dread' mood profile,      |
-|     |                 |         | danceability 0.55 fits the 'ecstatic-dread' mood  |
-|     |                 |         | profile                                           |
-+-----+-----------------+---------+---------------------------------------------------+
-| 4   | Midnight Coding | 45.50   | energy 0.42 is close to your target 0.50, valence |
-|     |                 |         | 0.56 fits the 'ecstatic-dread' mood profile,      |
-|     |                 |         | danceability 0.62 fits the 'ecstatic-dread' mood  |
-|     |                 |         | profile                                           |
-+-----+-----------------+---------+---------------------------------------------------+
-| 5   | Focus Flow      | 45.05   | energy 0.40 is close to your target 0.50, valence |
-|     |                 |         | 0.59 fits the 'ecstatic-dread' mood profile,      |
-|     |                 |         | danceability 0.60 fits the 'ecstatic-dread' mood  |
-|     |                 |         | profile                                           |
-+-----+-----------------+---------+---------------------------------------------------+
-```
-
-- **Out-of-Range Energy** (`energy = 5.0`): broke the scoring math instead of erroring — scores went negative for every song, since nothing clamps `target_energy` to `[0, 1]`.
-
-```
-=== Out-of-Range Energy ===
-user_prefs = {'genre': 'pop', 'mood': 'happy', 'energy': 5.0, 'likes_acoustic': False}
-+-----+----------------+---------+----------------------------------------------------+
-| #   | Title          | Score   | Reasons                                            |
-+=====+================+=========+====================================================+
-| 1   | Sunrise City   | 13.90   | genre 'pop' matches your favorite genre, mood      |
-|     |                |         | 'happy' matches your favorite mood, valence 0.84   |
-|     |                |         | fits the 'happy' mood profile                      |
-+-----+----------------+---------+----------------------------------------------------+
-| 2   | Gym Hero       | -3.15   | genre 'pop' matches your favorite genre, valence   |
-|     |                |         | 0.77 fits the 'happy' mood profile, acousticness   |
-|     |                |         | 0.05 matches your preference for non-acoustic      |
-|     |                |         | tracks                                             |
-+-----+----------------+---------+----------------------------------------------------+
-| 3   | Rooftop Lights | -13.65  | mood 'happy' matches your favorite mood, valence   |
-|     |                |         | 0.81 fits the 'happy' mood profile, danceability   |
-|     |                |         | 0.82 fits the 'happy' mood profile                 |
-+-----+----------------+---------+----------------------------------------------------+
-| 4   | Neon Horizon   | -28.90  | valence 0.80 fits the 'happy' mood profile,        |
-|     |                |         | acousticness 0.05 matches your preference for non- |
-|     |                |         | acoustic tracks, danceability 0.90 fits the        |
-|     |                |         | 'happy' mood profile                               |
-+-----+----------------+---------+----------------------------------------------------+
-| 5   | Concrete Kings | -31.85  | valence 0.65 fits the 'happy' mood profile,        |
-|     |                |         | danceability 0.88 fits the 'happy' mood profile,   |
-|     |                |         | acousticness 0.08 matches your preference for non- |
-|     |                |         | acoustic tracks                                    |
-+-----+----------------+---------+----------------------------------------------------+
-```
-
-- **Negative Energy** (`energy = -2.0`): same unvalidated-range problem; combined with a conflicting acoustic preference, all scores landed near 0 with no visual signal that the input was invalid.
-
-```
-=== Negative Energy ===
-user_prefs = {'genre': 'metal', 'mood': 'angry', 'energy': -2.0, 'likes_acoustic': True}
-+-----+-----------------------+---------+--------------------------------------------------+
-| #   | Title                 | Score   | Reasons                                          |
-+=====+=======================+=========+==================================================+
-| 1   | Iron Revolt           | 29.65   | genre 'metal' matches your favorite genre, mood  |
-|     |                       |         | 'angry' matches your favorite mood, valence 0.25 |
-|     |                       |         | fits the 'angry' mood profile                    |
-+-----+-----------------------+---------+--------------------------------------------------+
-| 2   | Moonlit Sonata Dreams | 3.25    | valence 0.55 fits the 'angry' mood profile,      |
-|     |                       |         | acousticness 0.95 matches your preference for    |
-|     |                       |         | acoustic tracks, danceability 0.15 fits the      |
-|     |                       |         | 'angry' mood profile                             |
-+-----+-----------------------+---------+--------------------------------------------------+
-| 3   | Spacewalk Thoughts    | 2.45    | valence 0.65 fits the 'angry' mood profile,      |
-|     |                       |         | acousticness 0.92 matches your preference for    |
-|     |                       |         | acoustic tracks, danceability 0.41 fits the      |
-|     |                       |         | 'angry' mood profile                             |
-+-----+-----------------------+---------+--------------------------------------------------+
-| 4   | Rainy Window Blues    | 1.90    | valence 0.30 fits the 'angry' mood profile,      |
-|     |                       |         | danceability 0.40 fits the 'angry' mood profile, |
-|     |                       |         | acousticness 0.55 matches your preference for    |
-|     |                       |         | acoustic tracks                                  |
-+-----+-----------------------+---------+--------------------------------------------------+
-| 5   | Library Rain          | 1.30    | valence 0.60 fits the 'angry' mood profile,      |
-|     |                       |         | danceability 0.58 fits the 'angry' mood profile, |
-|     |                       |         | acousticness 0.86 matches your preference for    |
-|     |                       |         | acoustic tracks                                  |
-+-----+-----------------------+---------+--------------------------------------------------+
-```
-
-- **Contradictory Acoustic Metal** (metal/angry + likes_acoustic): a valid but hard-to-satisfy profile — the top song still won comfortably on genre/mood/energy alone, with the acoustic term simply outweighed rather than breaking anything.
-
-```
-=== Contradictory Acoustic Metal ===
-user_prefs = {'genre': 'metal', 'mood': 'angry', 'energy': 0.95, 'likes_acoustic': True}
-+-----+--------------------+---------+----------------------------------------------------+
-| #   | Title              | Score   | Reasons                                            |
-+=====+====================+=========+====================================================+
-| 1   | Iron Revolt        | 88.65   | genre 'metal' matches your favorite genre, mood    |
-|     |                    |         | 'angry' matches your favorite mood, energy 0.97 is |
-|     |                    |         | close to your target 0.95                          |
-+-----+--------------------+---------+----------------------------------------------------+
-| 2   | Storm Runner       | 40.90   | energy 0.91 is close to your target 0.95, valence  |
-|     |                    |         | 0.48 fits the 'angry' mood profile, danceability   |
-|     |                    |         | 0.66 fits the 'angry' mood profile                 |
-+-----+--------------------+---------+----------------------------------------------------+
-| 3   | Broken Curfew      | 40.75   | energy 0.95 is close to your target 0.95, valence  |
-|     |                    |         | 0.55 fits the 'angry' mood profile, danceability   |
-|     |                    |         | 0.60 fits the 'angry' mood profile                 |
-+-----+--------------------+---------+----------------------------------------------------+
-| 4   | Rainy Window Blues | 38.10   | valence 0.30 fits the 'angry' mood profile,        |
-|     |                    |         | danceability 0.40 fits the 'angry' mood profile,   |
-|     |                    |         | energy 0.38 is close to your target 0.95            |
-+-----+--------------------+---------+----------------------------------------------------+
-| 5   | Night Drive Loop   | 38.05   | energy 0.75 is close to your target 0.95, valence  |
-|     |                    |         | 0.49 fits the 'angry' mood profile, danceability   |
-|     |                    |         | 0.66 fits the 'angry' mood profile                 |
-+-----+--------------------+---------+----------------------------------------------------+
-```
-
-- **Invalid Scoring Mode** (`mode = "vibes_based"`): the only input actually rejected — raises a clear `ValueError` listing valid modes.
-
-```
-=== Invalid Scoring Mode ===
-user_prefs = {'genre': 'pop', 'mood': 'happy', 'energy': 0.8, 'mode': 'vibes_based'}
-ERROR: ValueError: Unknown scoring mode 'vibes_based'. Valid modes: balanced, energy_focused, genre_first, mood_first
-```
-
-**Takeaway:** the system only validates `mode`. Every other bad input (unknown genre/mood, out-of-range energy) is silently absorbed and still rendered in the same polished, confident table as a legitimate result — this is the main risk area.
+Output:
+> 🥇 **Hauseingang** — Pashanim (66.5)
+> *mood 'angry' matches your favorite mood, valence 0.28 fits the 'angry' mood profile, energy 0.40 is close to your target 0.10*
+>
+> 🥈 **Paper Reverie** — Cobalt Drift (65.5)
+> *genre 'classical' matches your favorite genre, energy 0.31 is close to your target 0.10, valence 0.27 fits the 'angry' mood profile*
+>
+> 🥉 **Electric Reverie** — Ember Row (65.5)
+> *genre 'classical' matches your favorite genre, energy 0.12 is close to your target 0.10, valence 0.48 fits the 'angry' mood profile*
+>
+> Even an unusual combination of preferences still returns a ranked, explained list — scores are just lower since fewer features match well.
 
 ---
 
-## Limitations and Risks
+## Testing Summary
 
-- Only validates `mode`; all other invalid input (unknown genre/mood, out-of-range energy) fails silently rather than erroring or warning
-- Exact-match genre/mood scoring narrows discovery and can reinforce a user's existing habits
-- Small, static catalog — no real-world scale or freshness
-- No understanding of lyrics, audio content, or language — purely metadata-driven
-- No handling for conflicting preferences beyond weighted averaging
+Tested with `pytest` across the recommender scoring, sanitization, RAG fetch/fallback, vector store embedding/search, and CSV dataset loading:
 
-See [model_card.md](model_card.md) for a deeper look at bias and fairness.
+- Structured scoring produces a correctly ranked, explained list, and respects the per-artist diversity cap
+- Song sanitization fills missing fields, clamps out-of-range values, and drops unsalvageable rows
+- `get_recommendations()` correctly branches between structured-only, free-text-only, and combined modes without the caller having to specify a mode
+- RAG fetch parses live data, derives mood, and falls back to the CSV pool on download failure
+- Vector store embedding is incremental (only new song IDs get embedded) and search returns matches or an empty result for an empty store
+- Adversarial profiles (invalid scoring mode, empty preferences, nonexistent genre/mood, out-of-range or negative energy, contradictory preferences) still rank without crashing
+- The real `data/songs.csv` dataset parses cleanly end-to-end and matches direct sanitization
+
+```
+tests\test_adversarial_profiles.py ......                                             [ 20%]
+tests\test_get_recommendations.py ....                                                [ 34%]
+tests\test_load_songs_fixture.py ...                                                  [ 44%]
+tests\test_rag.py ....                                                                [ 58%]
+tests\test_recommender.py ......                                                      [ 79%]
+tests\test_songs_csv_dataset.py ..                                                    [ 86%]
+tests\test_vector_store.py ....                                                       [100%]
+
+==================================== 29 passed in 4.06s ====================================
+```
+
+Overall, all the functons worked as intended. The unit tests were written to ensure proper functionality of bare functions and prevent any error leaks into the streamlit app's logic.
 
 ---
 
 ## Reflection
 
-Read and complete `model_card.md`:
-
-[**Model Card**](model_card.md)
-
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
-
-Building this system showed me that a recommender turns data into predictions by comparing labeled item features against stated user preferences, then combining the differences into a single weighted score — no real "understanding" required, just feature engineering and tunable weights. The clearest bias I found came from the data, not the algorithm: because pop was the only genre with two songs in the catalog, a pop fan got a fully on-genre list while every other fan's results were padded with mismatched songs. This showed me that unfairness can stem entirely from an unbalanced dataset, and that the system's silent fallbacks on bad input (blank preferences, made-up genres, out-of-range values) make that bias harder to notice rather than surfacing it.
+This project really helped me work on my system design principles and taught me a lot on understanding the importance of considering tradeoffs when designing a complicated system. Working with Claude Code throughout this project has shown me that AI is more than capable of building code at production level, but needs guidance with how to best construct systems and tailor a product for its users. I believe that knowing how to code should still be at the forefront of software engineering, but AI definitely speeds up the software development cycle and allows for coders to focus more on the complex, creative decisions at the system(s) level.
