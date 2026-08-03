@@ -1,5 +1,7 @@
 import hashlib
 
+import pytest
+
 from src import vector_store
 from src.recommender import Song
 
@@ -37,6 +39,9 @@ def use_isolated_store(monkeypatch, tmp_path):
     monkeypatch.setattr(vector_store, "embed_texts", fake_embed_texts)
 
 
+@pytest.mark.filterwarnings(
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning"
+)
 def test_embed_songs_is_incremental(monkeypatch, tmp_path):
     use_isolated_store(monkeypatch, tmp_path)
     songs = [make_song(1, "Song One"), make_song(2, "Song Two")]
