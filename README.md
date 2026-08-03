@@ -78,13 +78,13 @@ Output:
 | Describe what you're in the mood for | `late-night driving music with a dreamy vibe` |
 
 Output:
-> 🥈 **Night Drive** — The Midnight (88.6)
+> 🥇 **Night Drive** — The Midnight (88.6)
 > *mood 'moody' matches your favorite mood, valence 0.42 fits the 'moody' mood profile, danceability 0.61 fits the 'moody' mood profile*
 >
-> 🥉 **Nightcall** — Kavinsky (85.9)
+> 🥈 **Nightcall** — Kavinsky (85.9)
 > *mood 'moody' matches your favorite mood, valence 0.38 fits the 'moody' mood profile, energy 0.55 is close to your target 0.50*
 >
-> 4. **Instant Crush** — Daft Punk ft. Julian Casablancas (83.1)
+> 🥉 **Instant Crush** — Daft Punk ft. Julian Casablancas (83.1)
 > *valence 0.45 fits the 'moody' mood profile, danceability 0.58 fits the 'moody' mood profile, energy 0.60 is close to your target 0.50*
 
 **Example 3 — Mismatched/uncommon preferences**
